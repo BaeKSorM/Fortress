@@ -20,6 +20,7 @@ public class UIManager : MonoBehaviour
         WeaponOptions = GameObject.Find("WeaponOptions").transform;
         WeaponChoose = GameObject.Find("WeaponChoose").GetComponent<Button>();
         WeaponChoose.onClick.AddListener(OpenWeaponOptions);
+        CloseWeaponOption();
         for (int i = 0; i < WeaponOptions.childCount; ++i)
         {
             int count = i;
