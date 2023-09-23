@@ -333,7 +333,7 @@ public class PlayerController : MonoBehaviour
             default:
                 break;
         }
-        Debug.Log(((int)selectedWeaponType));
+        // Debug.Log(((int)selectedWeaponType));
         UIManager.Instance.DecreaseWeaponCount((int)selectedWeaponType);
     }
 
@@ -438,9 +438,9 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Weapon"))
+        if (other.CompareTag("Explosion"))
         {
-            hpBar.value -= other.GetComponent<Weapons>().damage;
+            hpBar.value -= other.GetComponentInParent<Weapons>().damage;
         }
     }
 }

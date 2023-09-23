@@ -32,8 +32,8 @@ public class Ground : MonoBehaviour
         pixelHeight = sr.sprite.texture.height;
         CameraController.Instance.mapLeftMax = -worldWidth / 2;
         CameraController.Instance.mapRightMax = worldWidth / 2;
-        Debug.Log(worldWidth + "," + worldHeight);
-        Debug.Log(pixelWidth + "," + pixelHeight);
+        // Debug.Log(worldWidth + "," + worldHeight);
+        // Debug.Log(pixelWidth + "," + pixelHeight);
 
         polygonCollider = GetComponent<PolygonCollider2D>();
         compositeCollider = GetComponent<CompositeCollider2D>();
@@ -166,10 +166,10 @@ public class Ground : MonoBehaviour
         Vector2Int pixelPosition = Vector2Int.zero;
         var dx = pos.x - transform.position.x;
         var dy = pos.y - transform.position.y;
-        Debug.Log(dx + "," + dy);
+        // Debug.Log(dx + "," + dy);
         pixelPosition.x = Mathf.RoundToInt(0.5f * pixelWidth + dx * (pixelWidth / worldWidth));
         pixelPosition.y = Mathf.RoundToInt(0.5f * pixelHeight + dy * (pixelHeight / worldHeight));
-        Debug.Log(pixelPosition);
+        // Debug.Log(pixelPosition);
 
         return pixelPosition;
     }

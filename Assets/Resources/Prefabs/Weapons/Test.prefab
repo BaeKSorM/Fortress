@@ -189,15 +189,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e870bd9c7f130643a77019060f0029a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 0}
-  rigidbody: {fileID: 0}
-  explosionArea: {fileID: 0}
-  damage: 0
-  horizontalDivision: 0
-  verticalDivision: 0
-  polygonCollider: {fileID: 0}
-  movePoint: 0
-  rigidbody: {fileID: 0}
+  increaseNumber: 0
 --- !u!50 &-4076254312665052555
 Rigidbody2D:
   serializedVersion: 4
