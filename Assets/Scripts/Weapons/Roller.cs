@@ -127,7 +127,7 @@ public class Roller : Weapons
         {
             if (_movePoint - 1 < 0)
             {
-                _movePoint = polygonCollider.points.Length - 1;
+                return polygonCollider.points.Length - 1;
             }
             else
             {
@@ -138,7 +138,7 @@ public class Roller : Weapons
         {
             if (_movePoint + 1 > polygonCollider.points.Length - 1)
             {
-                _movePoint = 0;
+                return 0;
             }
             else
             {
@@ -153,7 +153,7 @@ public class Roller : Weapons
         {
             if (_movePoint - 1 < 0)
             {
-                _movePoint = polygonCollider.points.Length - 1;
+                return polygonCollider.points.Length - 1;
             }
             else
             {

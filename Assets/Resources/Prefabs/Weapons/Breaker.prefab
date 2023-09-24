@@ -98,7 +98,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4015157935635097681}
   - component: {fileID: 8645172805610435313}
-  - component: {fileID: 2786236008969472519}
+  - component: {fileID: 2056666680775627142}
   - component: {fileID: -4076254312665052555}
   - component: {fileID: 549117958867074364}
   - component: {fileID: 4419064540610253488}
@@ -177,7 +177,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &2786236008969472519
+--- !u!114 &2056666680775627142
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -186,15 +186,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 6374049648550552176}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5df2812239f94774fbb8d14fc4ea8a28, type: 3}
+  m_Script: {fileID: 11500000, guid: 15321fa082b8fdd4d925838f20e1d198, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 0}
   rigidbody: {fileID: 0}
   explosionArea: {fileID: 0}
   damage: 0
-  horizontalDivision: 0
-  verticalDivision: 0
+  horizontalDivision: 1
+  verticalDivision: 1
+  moveX: 1.5
+  moveY: 4.2
+  isDroped: 0
 --- !u!50 &-4076254312665052555
 Rigidbody2D:
   serializedVersion: 4

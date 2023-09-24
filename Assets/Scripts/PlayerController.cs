@@ -239,11 +239,11 @@ public class PlayerController : MonoBehaviour
         if (myTurn && isRotatecannon)
         {
             int directionCheck = (int)transform.localScale.x;
-            if (Input.GetKey(upKey) && (cannon.transform.eulerAngles.z < cannonRotateMaxAngle + transform.eulerAngles.z || cannon.transform.eulerAngles.z > 190 + cannonRotateMaxAngle + transform.eulerAngles.z))
+            if (Input.GetKey(upKey))
             {
                 cannonUp(directionCheck);
             }
-            if (Input.GetKey(downKey) && (cannon.transform.eulerAngles.z > cannonRotateMinAngle + transform.eulerAngles.z))
+            if (Input.GetKey(downKey))
             {
                 cannonDown(directionCheck);
             }
@@ -311,7 +311,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public List<string> weaponNames = new List<string>() { "Shot", "Three-Ball", "One-Bounce", "Roller", "Back-Roller", "Granade", "Spliter", "Breaker", "Snipers" };
+    public List<string> weaponNames = new List<string>() { "Shot", "Three-Ball", "One-Bounce", "Roller", "Back-Roller", "Granade", "Spliter", "Breaker", "Sniper" };
 
     public void Shoot(UIManager.SelectedWeaponType selectedWeaponType)
     {
@@ -341,6 +341,7 @@ public class PlayerController : MonoBehaviour
     {
         GameObject weaponClone = Instantiate(Resources.Load<GameObject>("Prefabs/Weapons/" + weaponNames[weaponNumber]), shootPositon.position, Quaternion.identity);
         weaponClone.GetComponent<Rigidbody2D>().AddForce((shootPositon.position - cannon.transform.position) * chargingGaugeBar.value, ForceMode2D.Impulse);
+        Debug.Log(chargingGaugeBar.value);
     }
     public void ShootType(int weaponNumber, float angle)
     {
@@ -405,15 +406,6 @@ public class PlayerController : MonoBehaviour
         else
         {
             isWalkOnSlope = true;
-        }
-
-        if (isOnSlope && isWalkOnSlope && xInput == 0.0f)
-        {
-            // rigidbody.sharedMaterial = fullFriction;
-        }
-        else
-        {
-            // rigidbody.sharedMaterial = noFriction;
         }
     }
 
