@@ -1,8 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using ExitGames.Client.Photon.StructWrapping;
-using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Breaker : Weapons

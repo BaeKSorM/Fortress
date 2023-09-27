@@ -55,9 +55,9 @@ public class Weapons : MonoBehaviour
     public IEnumerator Explosion()
     {
         rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
-        // animator.SetTrigger("Explosion");
-        // explosionArea.SetActive(true);
+        animator.SetTrigger("Explosion");
+        explosionArea.SetActive(true);
         yield return new WaitForSeconds(1.0f);
-        // Destroy(gameObject);
+        Destroy(gameObject);
     }
 }

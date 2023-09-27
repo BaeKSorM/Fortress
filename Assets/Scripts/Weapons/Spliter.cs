@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using ExitGames.Client.Photon.StructWrapping;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Spliter : Weapons
