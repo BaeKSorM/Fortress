@@ -178,7 +178,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Tank_Green_0
+      name: Green_0
       rect:
         serializedVersion: 2
         x: 133
@@ -199,7 +199,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Tank_Green_1
+      name: Green_1
       rect:
         serializedVersion: 2
         x: 103
@@ -220,7 +220,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Tank_Green_2
+      name: Green_2
       rect:
         serializedVersion: 2
         x: 0
@@ -228,7 +228,7 @@ TextureImporter:
         width: 551
         height: 131
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -251,11 +251,11 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      Green_0: 2009167516
+      Green_1: -174448441
+      Green_2: 891987994
       TanK_Body_Green: -2061851833
       Tank_Cannon_Green: 567873046
-      Tank_Green_0: 2009167516
-      Tank_Green_1: -174448441
-      Tank_Green_2: 891987994
       Tank_Green_Bottom: 1897372693
       Tank_Green_Top: 634090242
   mipmapLimitGroupName: 

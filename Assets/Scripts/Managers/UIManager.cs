@@ -6,11 +6,14 @@ using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
+using System.Linq;
+using Unity.VisualScripting;
+using ExitGames.Client.Photon.StructWrapping;
 
 public class UIManager : MonoBehaviourPunCallbacks
 {
     public static UIManager Instance;  // UIManager의 인스턴스를 관리합니다.
-
+    public Sprite testImage;
     // 게임 UI 요소
     public GameObject niddle;  // 움직임 슬라이더
     public enum CurrentScene { Ready, Game };  // 현재 장면 상태를 나타내는 열거형
@@ -28,6 +31,9 @@ public class UIManager : MonoBehaviourPunCallbacks
     public Button weaponsButton;  // 무기 선택 버튼
     public Button itemsButton;  // 무기 선택 버튼
     public Button gameStart;  // 게임 시작 버튼
+    public Button gameReady;
+    public Button gameReadyCancel;
+    public Button gameQuit;
 
     // Ready 장면 UI 요소
     public Transform roomUI;  // 방 관련 UI
@@ -36,35 +42,39 @@ public class UIManager : MonoBehaviourPunCallbacks
     public Transform content;
     public Transform maps;  // 맵 목록
     public Transform infomationBG;
-    public Image mapImage;  // 맵 이미지
     public Transform custom;  // 탱크 커스터마이징
     public Transform stats;  // 통계
+    public TMP_Text restStats;
+    public int restStatsCount;
+    public int restStatsMaxCount;
+    public enum ItemType { doubleShot, shield };
+    public ItemType itemType;
+    public Transform doubleShot;
+    public int doubleShotCount;
+    public Transform doubleShotCounts;
+    public Button doubleShotPlus;
+    public Button doubleShotMinus;
+    public Transform shield;
+    public int shieldCount;
+    public Transform shieldCounts;
+    public Button shieldPlus;
+    public Button shieldMinus;
     public int roomNameLength;  // 방 이름 길이
-    public Image cannonImage;  // 탱크 포 이미지
-    public Image playerCannonImage;  // 플래이어창 탱크 포 이미지
-    public Image tankTopImage;  // 탱크 상단 이미지
-    public Image playerTankTopImage;  // 플래이어창 탱크 상단 이미지
-    public Image tankBottomImage;  // 탱크 하단 이미지
+    public int readiedPlayerCount;
     public Transform buttons;
-    public Image playerTankBottomImage;  // 플래이어창 탱크 하단 이미지
     public Button previousMapButton;  // 이전 맵 버튼
     public Button nextMapButton;  // 다음 맵 버튼
-    public Button previousCannonButton;  // 이전 포 이미지 버튼
-    public Button nextCannonButton;  // 다음 포 이미지 버튼
-    public Button previousTankTopButton;  // 이전 상단 이미지 버튼
-    public Button nextTankTopButton;  // 다음 상단 이미지 버튼
-    public Button previousTankBottomButton;  // 이전 하단 이미지 버튼
-    public Button nextTankBottomButton;  // 다음 하단 이미지 버튼
+    public List<Button> tankImageChangeButtons;
     public TMP_Text mapName;  // 맵 이름 텍스트
     public TMP_Text inviteKey;
     public TMP_Text mapMaxPlayerText;  // 맵 최대 플레이어 수 텍스트
 
     // 맵과 탱크 커스터마이징을 위한 리스트들
-    public int currentMapIndex;
     public List<string> mapNames;  // 맵 이름 리스트
     public List<string> tankNames;  // 탱크 이름 리스트
     public List<int> mapMaxPlayerCounts;  // 맵 최대 플레이어 수 리스트
-    public List<int> currentTankImageIndex;  // 현재 탱크 이미지 인덱스 리스트
+    public List<int> currentImageIndexes;  // 현재 탱크 이미지 인덱스 리스트
+    public List<Image> currentImage;  // 
 
     // Room Lobby를 위한 UI 요소들
     public Button makeRoomButton;  // 방 만들기 버튼
@@ -75,38 +85,17 @@ public class UIManager : MonoBehaviourPunCallbacks
     public Button cancelJoinRoomButton;  // 방 입장 취소 버튼
     public TMP_InputField roomKey;  // 방 키 입력 필드
     public TMP_Text ConnectionStatus;  // 연결 상태 텍스트
+    public TMP_Text text;
 
     // 기타 변수들
+    #region 나중에 게임 넘어갈때 저장해서 가져감
+    public Image playerCannonImage;  // 플래이어창 탱크 포 이미지
+    public Image playerTankTopImage;  // 플래이어창 탱크 상단 이미지
+    public Image playerTankBottomImage;  // 플래이어창 탱크 하단 이미지
+    #endregion
     public GameObject wrongRoomKeyMessage;  // 잘못된 방 키 메시지
     public List<string> roomNames;  // 방 이름 리스트
 
-    new void OnEnable()
-    {
-        switch (currentScene)
-        {
-            case CurrentScene.Ready:
-                SceneManager.sceneLoaded += OnSceneLoaded;
-                break;
-            case CurrentScene.Game:
-                SceneManager.sceneLoaded += OnSceneLoaded;
-                break;
-        }
-    }
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        if (scene.buildIndex == 1)
-        {
-            InitializeGameSceneUI();
-            currentScene = CurrentScene.Game;
-            Debug.Log(1);
-        }
-        else if (scene.buildIndex == 0)
-        {
-            InitializeReadySceneUI();
-            currentScene = CurrentScene.Ready;
-            Debug.Log(0);
-        }
-    }
     // Awake 함수: 게임 오브젝트 생성 시 호출
     void Awake()
     {
@@ -122,28 +111,19 @@ public class UIManager : MonoBehaviourPunCallbacks
         }
     }
 
-    // Start 함수: 게임 오브젝트가 활성화된 후에 호출
-    void Start()
-    {
-        // 현재 장면에 따라 초기화 함수를 호출합니다.
-        // switch (currentScene)
-        // {
-        //     case CurrentScene.Ready:
-        //         InitializeReadySceneUI();
-        //         break;
-        //     case CurrentScene.Game:
-        //         InitializeGameSceneUI();
-        //         break;
-        // }
-    }
-
     // Ready 장면 UI 초기화 함수
-    void InitializeReadySceneUI()
+    public void InitializeReadySceneUI()
     {
         PhotonNetwork.ConnectUsingSettings();
 
         gameStart = GameObject.Find("GoGame").GetComponent<Button>();
         gameStart.onClick.AddListener(() => GoGame());
+        gameReady = GameObject.Find("ReadyGame").GetComponent<Button>();
+        gameReady.onClick.AddListener(() => ReadyGame());
+        gameReadyCancel = GameObject.Find("ReadyCancelGame").GetComponent<Button>();
+        gameReadyCancel.onClick.AddListener(() => ReadyCancelGame());
+        gameQuit = GameObject.Find("QuitGame").GetComponent<Button>();
+        gameQuit.onClick.AddListener(() => QuitGame());
 
 
         lobby = GameObject.Find("Lobby").transform;
@@ -173,45 +153,45 @@ public class UIManager : MonoBehaviourPunCallbacks
 
 
         maps = roomUI.Find("Maps");
-        mapImage = maps.GetComponent<Image>();
+        currentImage[3] = maps.GetComponent<Image>();
         infomationBG = maps.Find("InfomationBG");
         buttons = maps.Find("Buttons");
         mapName = infomationBG.Find("MapName").GetComponent<TMP_Text>();
         mapMaxPlayerText = infomationBG.Find("MaxPlayerCount").GetComponent<TMP_Text>();
         inviteKey = infomationBG.Find("InviteKey").GetComponent<TMP_Text>();
         previousMapButton = buttons.Find("Previous").GetComponent<Button>();
-        previousMapButton.onClick.AddListener(() => PreviousMapImage());
+        previousMapButton.onClick.AddListener(() => PhotonPreviousImage(mapNames, currentImageIndexes[3], 3, 0));
         nextMapButton = buttons.Find("Next").GetComponent<Button>();
-        nextMapButton.onClick.AddListener(() => NextMapImage());
+        nextMapButton.onClick.AddListener(() => PhotonNextImage(mapNames, currentImageIndexes[3], 3, 0));
 
 
         custom = roomUI.Find("Custom");
-        cannonImage = custom.Find("TankCannonImage").GetComponent<Image>();
+        currentImage[4] = custom.Find("TankCannonImage").GetComponent<Image>();
+        currentImage[5] = custom.Find("TankTopImage").GetComponent<Image>();
+        currentImage[6] = custom.Find("TankBottomImage").GetComponent<Image>();
 
-        // playerCannonImage = 
-        previousCannonButton = cannonImage.transform.Find("Previous").GetComponent<Button>();
-        previousCannonButton.onClick.AddListener(() => PreviousImage(currentTankImageIndex[0], tankNames, cannonImage, 0));
-        nextCannonButton = cannonImage.transform.Find("Next").GetComponent<Button>();
-        nextCannonButton.onClick.AddListener(() => NextImage(currentTankImageIndex[0], tankNames, cannonImage, 0));
-        tankTopImage = custom.Find("TankTopImage").GetComponent<Image>();
-        // playerTankTopImage =
-        previousTankTopButton = tankTopImage.transform.Find("Previous").GetComponent<Button>();
-        previousTankTopButton.onClick.AddListener(() => PreviousImage(currentTankImageIndex[1], tankNames, tankTopImage, 1));
-        nextTankTopButton = tankTopImage.transform.Find("Next").GetComponent<Button>();
-        nextTankTopButton.onClick.AddListener(() => NextImage(currentTankImageIndex[1], tankNames, tankTopImage, 1));
-        tankBottomImage = custom.Find("TankBottomImage").GetComponent<Image>();
-        // playerTankBottomImage =
-        previousTankBottomButton = tankBottomImage.transform.Find("Previous").GetComponent<Button>();
-        previousTankBottomButton.onClick.AddListener(() => PreviousImage(currentTankImageIndex[2], tankNames, tankBottomImage, 2));
-        nextTankBottomButton = tankBottomImage.transform.Find("Next").GetComponent<Button>();
-        nextTankBottomButton.onClick.AddListener(() => NextImage(currentTankImageIndex[2], tankNames, tankBottomImage, 2));
+
         stats = roomUI.Find("Stats");
+        restStats = stats.GetChild(0).GetComponent<TMP_Text>();
+        doubleShot = stats.Find("DoubleShotBG");
+        doubleShotCounts = doubleShot.GetChild(1);
+        doubleShotPlus = doubleShot.Find("Plus").GetComponent<Button>();
+        doubleShotPlus.onClick.AddListener(() => AddStat(ItemType.doubleShot));
+        doubleShotMinus = doubleShot.Find("Minus").GetComponent<Button>();
+        doubleShotMinus.onClick.AddListener(() => SubtractStat(ItemType.doubleShot));
+        shield = stats.Find("ShieldBG");
+        shieldCounts = shield.GetChild(1);
+        shieldPlus = shield.Find("Plus").GetComponent<Button>();
+        shieldPlus.onClick.AddListener(() => AddStat(ItemType.shield));
+        shieldMinus = shield.Find("Minus").GetComponent<Button>();
+        shieldMinus.onClick.AddListener(() => SubtractStat(ItemType.shield));
+
         roomUI.gameObject.SetActive(false);
 
     }
 
     // Game 장면 UI 초기화 함수
-    void InitializeGameSceneUI()
+    public void InitializeGameSceneUI()
     {
         // 게임 장면의 UI를 초기화합니다.
         niddle = GameObject.Find("Niddle");
@@ -248,46 +228,78 @@ public class UIManager : MonoBehaviourPunCallbacks
         }
     }
 
-    // Update 함수: 매 프레임마다 호출
-    void Update()
+
+
+    // GoGame 함수: 게임 장면으로 이동
+    void GoGame()
     {
-        switch (currentScene)
+        SceneManager.LoadSceneAsync(mapName.text);
+    }
+    void ReadyGame()
+    {
+        photonView.RPC("RefreshReadiedPlayer", RpcTarget.All, 1);
+        gameReady.gameObject.SetActive(false);
+        gameReadyCancel.gameObject.SetActive(true);
+    }
+    void ReadyCancelGame()
+    {
+        photonView.RPC("RefreshReadiedPlayer", RpcTarget.All, -1);
+        gameReady.gameObject.SetActive(true);
+        gameReadyCancel.gameObject.SetActive(false);
+    }
+    void QuitGame()
+    {
+        PhotonNetwork.LeaveRoom();
+        roomUI.gameObject.SetActive(false);
+    }
+    void AddStat(ItemType itemType)
+    {
+        switch (itemType)
         {
-            case CurrentScene.Ready:
-                ConnectionStatus.text = PhotonNetwork.NetworkClientState.ToString();
-                if (Input.GetKeyDown(KeyCode.Return))
+            case ItemType.doubleShot:
+                if (restStatsCount > 0 && doubleShotCount < doubleShotCounts.childCount)
                 {
-                    lobby.gameObject.SetActive(true);
-                    makeRoomButton.gameObject.SetActive(true);
-                    joinRoomButton.gameObject.SetActive(true);
-                    joinRandomRoomButton.gameObject.SetActive(true);
+                    doubleShotCounts.GetChild(doubleShotCount++).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/UI/StatFilled");
+                    restStats.text = "Rest Stats : " + --restStatsCount;
                 }
-                // RefreshPlayerInfo();
                 break;
-            case CurrentScene.Game:
-                if (niddle.transform.eulerAngles.z > 90)
+            case ItemType.shield:
+                if (restStatsCount > 0 && shieldCount < shieldCounts.childCount)
                 {
-                    PlayerController.Instance.canMove = false;
+                    shieldCounts.GetChild(shieldCount++).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/UI/StatFilled");
+                    restStats.text = "Rest Stats : " + --restStatsCount;
                 }
                 break;
             default:
                 break;
         }
     }
-
-    public void RefreshPlayerInfo()
+    void SubtractStat(ItemType itemType)
     {
-        Debug.Log(content.childCount);
-        for (int i = 0; i < content.childCount; ++i)
+        switch (itemType)
         {
-            content.GetChild(i).GetComponent<PlayerInfomation>().playerOrder.text = (i + 1).ToString();
-            content.GetChild(i).GetComponent<PlayerInfomation>().playerName.text = (i + 1).ToString();
+            case ItemType.doubleShot:
+                if (restStatsCount < restStatsMaxCount && doubleShotCount > 0)
+                {
+                    doubleShotCounts.GetChild(--doubleShotCount).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/UI/StatUnFilled");
+                    restStats.text = "Rest Stats : " + ++restStatsCount;
+                }
+                break;
+            case ItemType.shield:
+                if (restStatsCount < restStatsMaxCount && shieldCount > 0)
+                {
+                    shieldCounts.GetChild(--shieldCount).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/UI/StatUnFilled");
+                    restStats.text = "Rest Stats : " + ++restStatsCount;
+                }
+                break;
+            default:
+                break;
         }
     }
-    // GoGame 함수: 게임 장면으로 이동
-    void GoGame()
+    [PunRPC]
+    public void RefreshReadiedPlayer(int plusMinus)
     {
-        SceneManager.LoadSceneAsync(1);
+        readiedPlayerCount += plusMinus;
     }
     // OpenWeaponOptions 함수: 무기 옵션 메뉴 열기
     void OpenWeaponOptions()
@@ -326,77 +338,139 @@ public class UIManager : MonoBehaviourPunCallbacks
     }
 
     // PreviousImage 함수: 이전 이미지로 변경
-    public void PreviousImage(int currentIndex, List<string> names, Image changingImage, int type)
+
+    public void PhotonPreviousImage(List<string> imageNames, int _currentImageIndex, int changingImageIndex, int type)
     {
-        if (currentIndex - 1 < 0)
+        Debug.Log(_currentImageIndex);
+        string imagePath;
+        if (_currentImageIndex - 1 < 0)
         {
-            currentIndex = names.Count - 1;
+            _currentImageIndex = imageNames.Count - 1;
         }
         else
         {
-            --currentIndex;
+            --_currentImageIndex;
         }
-        currentTankImageIndex[type] = currentIndex;
-        ChangeImage(changingImage, "Tanks/", names, currentIndex, type);
+        currentImageIndexes[changingImageIndex] = _currentImageIndex;
+        if (changingImageIndex < 3)
+        {
+            imagePath = "Tanks/" + imageNames[_currentImageIndex];
+            photonView.RPC("ChangeImageRPC", RpcTarget.All, imagePath, changingImageIndex, playerOrder, type);
+        }
+        else if (changingImageIndex < 4)
+        {
+            photonView.RPC("RefreshMapInfo", RpcTarget.All, _currentImageIndex);
+            imagePath = "Backgrounds/" + imageNames[_currentImageIndex];
+            photonView.RPC("ChangeImageRPC", RpcTarget.All, imagePath, changingImageIndex, type);
+        }
     }
+    public void PreviousImage(List<string> imageNames, int _currentImageIndex, int changingImageIndex, int type)
+    {
+        Debug.Log("P");
+        string imagePath = "";
+        if (_currentImageIndex - 1 < 0)
+        {
+            _currentImageIndex = imageNames.Count - 1;
+        }
+        else
+        {
+            --_currentImageIndex;
+        }
+        currentImageIndexes[changingImageIndex] = _currentImageIndex;
+        if (changingImageIndex < 7)
+        {
+            imagePath = "Tanks/" + imageNames[_currentImageIndex];
+        }
+
+        ChangeImage(imagePath, changingImageIndex, type);
+    }
+
 
     // NextImage 함수: 다음 이미지로 변경
-    public void NextImage(int currentIndex, List<string> names, Image changingImage, int type)
+
+    // 이미지이름들(포, 상단, 하단), 현재 색 번호, 바뀔이미지 번호(탱크, 맵)
+    public void PhotonNextImage(List<string> imageNames, int _currentImageIndex, int changingImageIndex, int type)
     {
-        if (currentIndex + 1 > names.Count - 1)
+        Debug.Log(_currentImageIndex + 1);
+        string imagePath = "";
+        if (_currentImageIndex + 1 > imageNames.Count - 1)
         {
-            currentIndex = 0;
+            _currentImageIndex = 0;
         }
         else
         {
-            ++currentIndex;
+            ++_currentImageIndex;
         }
-        currentTankImageIndex[type] = currentIndex;
-        ChangeImage(changingImage, "Tanks/", names, currentIndex, type);
-    }
-
-    // PreviousMapImage 함수: 이전 맵 이미지 표시
-    public void PreviousMapImage()
-    {
-        if (currentMapIndex - 1 < 0)
+        currentImageIndexes[changingImageIndex] = _currentImageIndex;
+        if (changingImageIndex < 3)
         {
-            currentMapIndex = mapNames.Count - 1;
+            imagePath = "Tanks/" + imageNames[_currentImageIndex];
+            photonView.RPC("ChangeImageRPC", RpcTarget.All, imagePath, changingImageIndex, playerOrder, type);
+        }
+        else if (changingImageIndex < 4)
+        {
+            photonView.RPC("RefreshMapInfo", RpcTarget.All, _currentImageIndex);
+            imagePath = "Backgrounds/" + imageNames[_currentImageIndex];
+            photonView.RPC("ChangeImageRPC", RpcTarget.All, imagePath, changingImageIndex, type);
+        }
+    }
+    public void NextImage(List<string> imageNames, int _currentImageIndex, int changingImageIndex, int type)
+    {
+        Debug.Log("N");
+        string imagePath = "";
+        if (_currentImageIndex + 1 > imageNames.Count - 1)
+        {
+            _currentImageIndex = 0;
         }
         else
         {
-            --currentMapIndex;
+            ++_currentImageIndex;
         }
-        MapSetting();
-    }
-
-    // NextMapImage 함수: 다음 맵 이미지 표시
-    public void NextMapImage()
-    {
-        if (currentMapIndex + 1 > mapNames.Count - 1)
+        currentImageIndexes[changingImageIndex] = _currentImageIndex;
+        if (changingImageIndex < 7)
         {
-            currentMapIndex = 0;
+            imagePath = "Tanks/" + imageNames[_currentImageIndex];
         }
-        else
-        {
-            ++currentMapIndex;
-        }
-        MapSetting();
+        ChangeImage(imagePath, changingImageIndex, type);
     }
-
-    // MapSetting 함수: 맵 설정
-    public void MapSetting()
+    public void ChangeImage(string _imagePath, int _changingImageIndex, int _type)
     {
-        ChangeImage(mapImage, "Backgrounds/", mapNames, currentMapIndex, 0);
-        mapName.text = mapNames[currentMapIndex];
-        mapMaxPlayerText.text = "MaxPlayers : " + mapMaxPlayerCounts[currentMapIndex];
+        Sprite sprite = Resources.LoadAll<Sprite>("Images/" + _imagePath)[_type];
+        currentImage[_changingImageIndex].sprite = sprite;
     }
-
+    [PunRPC]
     // ChangeImage 함수: 이미지 변경
-    public void ChangeImage(Image _changingImage, string path, List<string> names, int index, int _type)
+    public void ChangeImageRPC(string _imagePath, int _changingImageIndex, int playerOrder, int _type)
     {
-        _changingImage.sprite = Resources.LoadAll<Sprite>("Images/" + path + names[index])[_type];
+        Sprite sprite = Resources.LoadAll<Sprite>("Images/" + _imagePath)[_type];
+        content.GetChild(playerOrder).GetChild(2).GetChild(_changingImageIndex).GetComponent<Image>().sprite = sprite;
     }
-
+    [PunRPC]
+    // ChangeImage 함수: 이미지 변경
+    public void ChangeImageRPC(string _imagePath, int _changingImageIndex, int _type)
+    {
+        Sprite sprite = Resources.LoadAll<Sprite>("Images/" + _imagePath)[_type];
+        currentImage[_changingImageIndex].sprite = sprite;
+    }
+    [PunRPC]
+    public void RefreshMapInfo(int _currentImageIndex)
+    {
+        mapName.text = mapNames[_currentImageIndex];
+        mapMaxPlayerText.text = "MaxPlayers : " + mapMaxPlayerCounts[_currentImageIndex];
+    }
+    public override void OnConnectedToMaster()
+    {
+        Debug.Log("서버 연결");
+        PhotonNetwork.JoinLobby();
+    }
+    public override void OnJoinedLobby()
+    {
+        Debug.Log("로비 연결");
+    }
+    public override void OnJoinRandomFailed(short returnCode, string message)
+    {
+        MakeRoom();
+    }
     // MakeRoom 함수: 방 만들기
     public void MakeRoom()
     {
@@ -415,10 +489,6 @@ public class UIManager : MonoBehaviourPunCallbacks
     public void JoinRandomRoom()
     {
         PhotonNetwork.JoinRandomRoom();
-    }
-    public override void OnJoinRandomFailed(short returnCode, string message)
-    {
-        MakeRoom();
     }
     // EnterJoinRoom 함수: 방 입장 확인
     public void EnterJoinRoom()
@@ -464,4 +534,203 @@ public class UIManager : MonoBehaviourPunCallbacks
         roomNames.Add(randomName);
         return randomName;
     }
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    {
+        foreach (var room in roomList)
+        {
+            if (roomNames.Contains(room.Name))
+            {
+                continue;
+            }
+            roomNames.Add(room.Name);
+        }
+    }
+    public GameObject playerInfo;
+    public override void OnJoinedRoom()
+    {
+        Debug.Log("방연결");
+        inviteKey.text = "Invite : " + PhotonNetwork.CurrentRoom.Name;
+        roomUI.gameObject.SetActive(true);
+        string cannon = currentImage[4].GetComponent<Image>().sprite.name;
+        int cannonIdx = cannon.IndexOf("_");
+        cannon = cannon.Substring(0, cannonIdx);
+        string top = currentImage[5].GetComponent<Image>().sprite.name;
+        int topIdx = top.IndexOf("_");
+        top = top.Substring(0, topIdx);
+        string bottom = currentImage[6].GetComponent<Image>().sprite.name;
+        int bottomIdx = bottom.IndexOf("_");
+        bottom = bottom.Substring(0, bottomIdx);
+        photonView.RPC("SettingPlayerInfo", RpcTarget.AllBufferedViaServer, cannon, top, bottom);
+
+        if (!photonView.IsMine)
+        {
+            buttons.gameObject.SetActive(false);
+            gameStart.gameObject.SetActive(false);
+            gameReady.gameObject.SetActive(true);
+        }
+        else
+        {
+            currentImage[3].sprite = Resources.Load<Sprite>("images/Backgrounds/" + mapNames[0]);
+            gameStart.gameObject.SetActive(true);
+            gameReady.gameObject.SetActive(false);
+        }
+        gameReadyCancel.gameObject.SetActive(false);
+        playerActorNumbers.Add(PhotonNetwork.LocalPlayer.ActorNumber);
+        photonView.RPC("RefreshPlayerInfo", RpcTarget.AllViaServer);
+    }
+    public bool isSetButtons;
+    public int playerOrder;
+    public void SetPhotonButtons()
+    {
+        playerOrder = content.childCount - 1;
+        for (int i = 0; i < tankImageChangeButtons.Count; i += 2)
+        {
+            int count = i / 2;
+            tankImageChangeButtons[i] = currentImage[count + 4].transform.Find("Previous").GetComponent<Button>();
+            tankImageChangeButtons[i].onClick.AddListener(() => PhotonPreviousImage(tankNames, currentImageIndexes[count], count, count));
+            tankImageChangeButtons[i].onClick.AddListener(() => PreviousImage(tankNames, currentImageIndexes[count + 4], count + 4, count));
+            tankImageChangeButtons[i + 1] = currentImage[count + 4].transform.Find("Next").GetComponent<Button>();
+            tankImageChangeButtons[i + 1].onClick.AddListener(() => PhotonNextImage(tankNames, currentImageIndexes[count], count, count));
+            tankImageChangeButtons[i + 1].onClick.AddListener(() => NextImage(tankNames, currentImageIndexes[count + 4], count + 4, count));
+        }
+        isSetButtons = true;
+    }
+    [PunRPC]
+    public void SettingPlayerInfo(string cannonName, string topName, string bottomName)
+    {
+        playerInfo = PhotonNetwork.Instantiate("Prefabs/UI/PlayerInfomation", Vector2.zero, Quaternion.identity);
+        playerInfo.transform.SetParent(content);
+
+        playerInfo.transform.GetChild(2).GetChild(0).GetComponent<Image>().sprite = Resources.LoadAll<Sprite>("Images/Tanks/" + cannonName)[0];
+        playerInfo.transform.GetChild(2).GetChild(1).GetComponent<Image>().sprite = Resources.LoadAll<Sprite>("Images/Tanks/" + topName)[1];
+        playerInfo.transform.GetChild(2).GetChild(2).GetComponent<Image>().sprite = Resources.LoadAll<Sprite>("Images/Tanks/" + bottomName)[2];
+    }
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        Debug.Log(otherPlayer.ActorNumber);
+        for (int i = 0; i < PhotonNetwork.CurrentRoom.PlayerCount + 1; ++i)
+        {
+            if (playerActorNumbers[i] == otherPlayer.ActorNumber)
+            {
+                PhotonNetwork.Destroy(content.GetChild(i).gameObject);
+                Debug.Log(playerOrder);
+                Debug.Log(i + 1);
+                if (playerOrder > i)
+                {
+                    --playerOrder;
+                }
+                playerActorNumbers.RemoveAt(i);
+                break;
+            }
+        }
+        if (photonView.IsMine)
+        {
+            if (gameReadyCancel.gameObject.activeSelf)
+            {
+                photonView.RPC("RefreshReadiedPlayer", RpcTarget.All, -1);
+                gameReadyCancel.gameObject.SetActive(false);
+            }
+            else if (gameReady.gameObject.activeSelf)
+            {
+                gameReady.gameObject.SetActive(false);
+            }
+            if (!gameStart.gameObject.activeSelf)
+            {
+                gameStart.gameObject.SetActive(true);
+            }
+        }
+    }
+    public List<int> playerActorNumbers;
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        playerActorNumbers.Add(newPlayer.ActorNumber);
+        if (photonView.IsMine)
+        {
+            photonView.RPC("SetPlayerActorNumbers", RpcTarget.All, playerActorNumbers.ToArray());
+            for (int i = 0; i < content.childCount; ++i)
+            {
+                string cannon = content.GetChild(i).GetChild(2).GetChild(0).GetComponent<Image>().sprite.name;
+                int cannonIdx = cannon.IndexOf("_");
+                cannon = cannon.Substring(0, cannonIdx);
+                string top = content.GetChild(i).GetChild(2).GetChild(1).GetComponent<Image>().sprite.name;
+                int topIdx = top.IndexOf("_");
+                top = top.Substring(0, topIdx);
+                string bottom = content.GetChild(i).GetChild(2).GetChild(2).GetComponent<Image>().sprite.name;
+                int bottomIdx = bottom.IndexOf("_");
+                bottom = bottom.Substring(0, bottomIdx);
+                photonView.RPC("SetOriginPlayerImages", newPlayer, i, cannon, top, bottom);
+            }
+            int mapMaxPlayersIdx = mapNames.IndexOf(mapName.text);
+            photonView.RPC("SetMapImage", newPlayer, mapName.text, mapMaxPlayersIdx);
+        }
+    }
+    [PunRPC]
+    public void SetPlayerActorNumbers(int[] currentPlayerNumbers)
+    {
+        playerActorNumbers = currentPlayerNumbers.ToList();
+    }
+    [PunRPC]
+    public void SetOriginPlayerImages(int playerInfoCount, string cannonName, string topName, string bottomName)
+    {
+        content.GetChild(playerInfoCount).GetChild(2).GetChild(0).GetComponent<Image>().sprite = Resources.LoadAll<Sprite>("Images/Tanks/" + cannonName)[0];
+        content.GetChild(playerInfoCount).GetChild(2).GetChild(1).GetComponent<Image>().sprite = Resources.LoadAll<Sprite>("Images/Tanks/" + topName)[1];
+        content.GetChild(playerInfoCount).GetChild(2).GetChild(2).GetComponent<Image>().sprite = Resources.LoadAll<Sprite>("Images/Tanks/" + bottomName)[2];
+    }
+    [PunRPC]
+    public void SetMapImage(string mapNameText, int _mapMaxPlayersIdx)
+    {
+        currentImage[3].sprite = Resources.Load<Sprite>("Images/Backgrounds/" + mapNameText);
+        mapName.text = mapNameText;
+        mapMaxPlayerText.text = "MaxPlayers : " + mapMaxPlayerCounts[_mapMaxPlayersIdx];
+    }
+    [PunRPC]
+    public void RefreshPlayerInfo()
+    {
+        Debug.Log(content.childCount);
+        for (int i = 0; i < content.childCount; ++i)
+        {
+            if (content.GetChild(i).GetComponent<PlayerInfomation>().playerOrder)
+            {
+                content.GetChild(i).GetComponent<PlayerInfomation>().playerOrder.text = (i + 1).ToString();
+                content.GetChild(i).GetComponent<PlayerInfomation>().playerName.text = (i + 1).ToString();
+            }
+        }
+    }
+    void Update()
+    {
+        switch (currentScene)
+        {
+            case CurrentScene.Ready:
+                ConnectionStatus.text = PhotonNetwork.NetworkClientState.ToString();
+                if (content.childCount > 0)
+                {
+                    if (content.childCount != int.Parse(content.GetChild(content.childCount - 1).GetComponent<PlayerInfomation>().playerOrder.text))
+                    {
+                        photonView.RPC("RefreshPlayerInfo", RpcTarget.AllViaServer);
+                    }
+                    if (content.childCount == int.Parse(content.GetChild(content.childCount - 1).GetComponent<PlayerInfomation>().playerOrder.text) && !isSetButtons)
+                    {
+                        isSetButtons = false;
+                        SetPhotonButtons();
+                    }
+                }
+                if (Input.GetKeyDown(KeyCode.Return))
+                {
+                    lobby.gameObject.SetActive(true);
+                    makeRoomButton.gameObject.SetActive(true);
+                    joinRoomButton.gameObject.SetActive(true);
+                    joinRandomRoomButton.gameObject.SetActive(true);
+                }
+                break;
+            case CurrentScene.Game:
+                if (niddle.transform.eulerAngles.z > 90)
+                {
+                    PlayerController.Instance.canMove = false;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
 }

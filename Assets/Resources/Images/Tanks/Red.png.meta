@@ -178,7 +178,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Tank_Red_0
+      name: Red_0
       rect:
         serializedVersion: 2
         x: 133
@@ -186,7 +186,7 @@ TextureImporter:
         width: 289
         height: 43
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -199,7 +199,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Tank_Red_1
+      name: Red_1
       rect:
         serializedVersion: 2
         x: 104
@@ -207,7 +207,7 @@ TextureImporter:
         width: 343
         height: 124
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -220,7 +220,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Tank_Red_2
+      name: Red_2
       rect:
         serializedVersion: 2
         x: 0
@@ -228,7 +228,7 @@ TextureImporter:
         width: 551
         height: 131
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -251,11 +251,11 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      Red_0: 1855988354
+      Red_1: -1681686777
+      Red_2: -862115401
       Tank_Body_Red: 151375850
       Tank_Cannon_Red: -28575854
-      Tank_Red_0: 1855988354
-      Tank_Red_1: -1681686777
-      Tank_Red_2: -862115401
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

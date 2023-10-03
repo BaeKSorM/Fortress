@@ -34,14 +34,26 @@ MonoBehaviour:
   RunInBackground: 1
   StartInOfflineMode: 0
   RpcList:
+  - ChangeImage
   - ClickRpc
   - DestroyRpc
   - DestroySpaceship
   - Fire
   - RespawnSpaceship
-  - AddRoomName
   - SettingPlayerInfo
   - RefreshPlayerInfo
+  - RefreshMapInfo
+  - PhotonNextImage
+  - PhotonPreviousImage
+  - PhotonRPCNextImage
+  - ChangeImageRPC
+  - SetPhotonButtons
+  - SetPlayerActorNumbers
+  - SetUI
+  - SetMapImage
+  - SetPlayerImages
+  - RefreshReadiedPlayer
+  - SetOriginPlayerImages
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

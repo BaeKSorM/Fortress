@@ -178,7 +178,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Tank_Blue_0
+      name: Blue_0
       rect:
         serializedVersion: 2
         x: 133
@@ -199,11 +199,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Tank_Blue_1
+      name: Blue_1
       rect:
         serializedVersion: 2
-        x: 104
-        y: 131
+        x: 103
+        y: 129
         width: 342
         height: 124
       alignment: 0
@@ -220,7 +220,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Tank_Blue_2
+      name: Blue_2
       rect:
         serializedVersion: 2
         x: 0
@@ -251,10 +251,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      Blue_0: 196586914
+      Blue_1: 1607700298
+      Blue_2: 1355616247
       Tank _Cannon_Blue: 887262286
-      Tank_Blue_0: 196586914
-      Tank_Blue_1: 1607700298
-      Tank_Blue_2: 1355616247
       Tank_Body_Blue: 2063326242
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0

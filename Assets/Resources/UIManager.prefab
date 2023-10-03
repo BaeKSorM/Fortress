@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 718466861141545657}
   - component: {fileID: 4757433447042319244}
+  - component: {fileID: 5315149436124500375}
   m_Layer: 0
   m_Name: UIManager
   m_TagString: Untagged
@@ -44,10 +45,85 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2449d0a02c6670141a5924f6b0196144, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  canMoveSlider: {fileID: 0}
+  niddle: {fileID: 0}
   currentScene: 0
   selectedWeaponType: 0
-  WeaponOptions: {fileID: 0}
+  selectedItemType: 0
+  weaponOptions: {fileID: 0}
+  itemOptions: {fileID: 0}
   weapons: []
-  WeaponChoose: {fileID: 0}
-  GameStart: {fileID: 0}
+  items: []
+  weaponsButton: {fileID: 0}
+  itemsButton: {fileID: 0}
+  gameStart: {fileID: 0}
+  roomUI: {fileID: 0}
+  lobby: {fileID: 0}
+  players: {fileID: 0}
+  content: {fileID: 0}
+  maps: {fileID: 0}
+  infomationBG: {fileID: 0}
+  mapImage: {fileID: 0}
+  custom: {fileID: 0}
+  stats: {fileID: 0}
+  roomNameLength: 5
+  cannonImage: {fileID: 0}
+  playerCannonImage: {fileID: 0}
+  tankTopImage: {fileID: 0}
+  playerTankTopImage: {fileID: 0}
+  tankBottomImage: {fileID: 0}
+  buttons: {fileID: 0}
+  playerTankBottomImage: {fileID: 0}
+  previousMapButton: {fileID: 0}
+  nextMapButton: {fileID: 0}
+  previousCannonButton: {fileID: 0}
+  nextCannonButton: {fileID: 0}
+  previousTankTopButton: {fileID: 0}
+  nextTankTopButton: {fileID: 0}
+  previousTankBottomButton: {fileID: 0}
+  nextTankBottomButton: {fileID: 0}
+  mapName: {fileID: 0}
+  inviteKey: {fileID: 0}
+  mapMaxPlayerText: {fileID: 0}
+  currentMapIndex: 0
+  mapNames:
+  - GrassLand
+  - GrassLand2
+  - GrassLand3
+  tankNames:
+  - Green
+  - Blue
+  - Red
+  mapMaxPlayerCounts: 020000000400000003000000
+  currentTankImageIndex: 000000000000000000000000
+  makeRoomButton: {fileID: 0}
+  joinRoomButton: {fileID: 0}
+  joinRandomRoomButton: {fileID: 0}
+  insertRooomKey: {fileID: 0}
+  enterJoinRoomButton: {fileID: 0}
+  cancelJoinRoomButton: {fileID: 0}
+  roomKey: {fileID: 0}
+  ConnectionStatus: {fileID: 0}
+  wrongRoomKeyMessage: {fileID: 0}
+  roomNames: []
+--- !u!114 &5315149436124500375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7017528311871778887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
