@@ -7,6 +7,9 @@ EditorBuildSettings:
   m_Scenes:
   - enabled: 1
     path: Assets/Scenes/StartScene.unity
+    guid: 39e9d61ea13429c42b5d43e4b9399d89
+  - enabled: 1
+    path: Assets/Scenes/LobbyScene.unity
     guid: 13c51b9710327fc439c105658ee60a92
   - enabled: 1
     path: Assets/Scenes/GrassLand.unity

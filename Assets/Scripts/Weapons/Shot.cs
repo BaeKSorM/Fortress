@@ -8,9 +8,6 @@ public class Shot : Weapons
         if (other.gameObject.CompareTag("Ground"))
         {
             StartCoroutine(Explosion());
-            // #if UNITY_EDITOR
-            //             UnityEditor.EditorApplication.isPaused = true;
-            // #endif
         }
     }
 }

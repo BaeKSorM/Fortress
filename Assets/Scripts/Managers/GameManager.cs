@@ -21,27 +21,29 @@ public class GameManager : MonoBehaviour
     }
     void OnEnable()
     {
-        switch (UIManager.Instance.currentScene)
-        {
-            case UIManager.CurrentScene.Ready:
-                SceneManager.sceneLoaded += OnSceneLoaded;
-                break;
-            case UIManager.CurrentScene.Game:
-                SceneManager.sceneLoaded += OnSceneLoaded;
-                break;
-        }
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        // switch (UIManager.Instance.currentScene)
+        // {
+        //     case UIManager.CurrentScene.Ready:
+        //         break;
+        //     case UIManager.CurrentScene.Game:
+        //         SceneManager.sceneLoaded += OnSceneLoaded;
+        //         break;
+        // }
     }
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (scene.buildIndex == 0)
+        Debug.Log(scene.buildIndex);
+        if (scene.buildIndex == 1)
         {
-            UIManager.Instance.InitializeReadySceneUI();
+
             UIManager.Instance.currentScene = UIManager.CurrentScene.Ready;
+            UIManager.Instance.InitializeReadySceneUI();
         }
-        else
+        else if (scene.buildIndex > 1)
         {
-            UIManager.Instance.InitializeGameSceneUI();
             UIManager.Instance.currentScene = UIManager.CurrentScene.Game;
+            UIManager.Instance.InitializeGameSceneUI();
         }
     }
 }

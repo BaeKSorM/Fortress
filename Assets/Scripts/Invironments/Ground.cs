@@ -1,7 +1,8 @@
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
-public class Ground : MonoBehaviour
+public class Ground : MonoBehaviourPun
 {
     public Texture2D mapTexture;
     public Texture2D newTexture;
@@ -34,14 +35,10 @@ public class Ground : MonoBehaviour
         polygonCollider = GetComponent<PolygonCollider2D>();
         compositeCollider = GetComponent<CompositeCollider2D>();
     }
-    public void MakeHole(Collider2D _other)
+    // [PunRPC]
+    public void MakeHole(int radius, int horizontalDivision, int verticalDivision, int colliderCenterX, int colliderCenterY)
     {
-        CapsuleCollider2D c2d = _other.GetComponent<CapsuleCollider2D>();
-        Vector2Int colliderCenter = WorldToPixel(c2d.bounds.center);
-        int radius = Mathf.RoundToInt(c2d.bounds.size.x / 2 * pixelWidth / worldWidth);
-        int horizontalDivision = _other.GetComponentInParent<Weapons>().horizontalDivision;
-        int verticalDivision = _other.GetComponentInParent<Weapons>().verticalDivision;
-
+        Vector2Int colliderCenter = new(colliderCenterX, colliderCenterY);
         int px, nx, py, ny, distance;
         if (colliderCenter.y > minDestroyHeight)
         {
@@ -68,62 +65,6 @@ public class Ground : MonoBehaviour
                 }
             }
         }
-
-        #region 폐기
-        // // c2d.bounds.size.x  가 홀수 면 +1
-        // int widthRadius = 23;//Mathf.RoundToInt(17 * pixelWidth / worldWidth); //n*2+3
-        // int heightRadius = 10;//Mathf.RoundToInt(7 * pixelWidth / worldWidth); //n
-
-        // // Debug.Log(colliderCenter);
-        // int[] x = new int[5];
-        // int[] y = new int[heightRadius];
-        // int xone = 1;
-        // int xtwo = 2;
-        // int num = 1;
-        // int numCopy;
-        // for (int i = 0; i < heightRadius / 2; ++i)
-        // {
-        //     x[0] = colliderCenter.x + 0;
-        //     x[1] = colliderCenter.x + xone;
-        //     x[2] = colliderCenter.x - xone;
-        //     x[3] = colliderCenter.x + xtwo;
-        //     x[4] = colliderCenter.x - xtwo;
-        //     numCopy = num;
-        //     for (int j = 0; j < heightRadius - 1;)
-        //     {
-        //         if (j == 0)
-        //         {
-        //             y[j] = colliderCenter.y + 0;
-        //             ++j;
-        //         }
-        //         else if (numCopy > 0)
-        //         {
-        //             Debug.Log(numCopy);
-        //             y[j] = colliderCenter.y + numCopy;
-        //             y[j + 1] = colliderCenter.y - numCopy;
-        //             ++numCopy;
-        //             j += 2;
-        //         }
-        //         else
-        //         {
-        //             Debug.Log(numCopy);
-        //             ++numCopy;
-        //             j += 2;
-        //         }
-        //     }
-        //     --num;
-        //     xone += 2;
-        //     xtwo += 2;
-        //     for (int j = 0; j < 5; ++j)
-        //     {
-        //         for (int k = 0; k < heightRadius; ++k)
-        //         {
-        //             newTexture.SetPixel(x[j], y[k], Color.clear);
-        //             Debug.Log((x[j] - colliderCenter.x) + "," + (y[k] - colliderCenter.y));
-        //         }
-        //     }
-        // }
-        #endregion
         newTexture.Apply();
         MakeSprite();
 
@@ -136,7 +77,14 @@ public class Ground : MonoBehaviour
     {
         if (other.CompareTag("Explosion"))
         {
-            MakeHole(other);
+            CapsuleCollider2D c2d = other.GetComponent<CapsuleCollider2D>();
+            Vector2Int colliderCenter = WorldToPixel(c2d.bounds.center);
+            int radius = Mathf.RoundToInt(c2d.bounds.size.x / 2 * pixelWidth / worldWidth);
+            int horizontalDivision = other.GetComponentInParent<Weapons>().horizontalDivision;
+            int verticalDivision = other.GetComponentInParent<Weapons>().verticalDivision;
+            int colliderCenterX = colliderCenter.x;
+            int colliderCenterY = colliderCenter.y;
+            MakeHole(radius, horizontalDivision, verticalDivision, colliderCenterX, colliderCenterY);
         }
     }
     public void MakeDot(Vector3 pos)

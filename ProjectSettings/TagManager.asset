@@ -8,6 +8,7 @@ TagManager:
   - Ground
   - Explosion
   - Wall
+  - Cannon
   layers:
   - Default
   - TransparentFX
@@ -20,7 +21,7 @@ TagManager:
   - Player
   - Weapon
   - NoCollide
-  - 
+  - DamageArea
   - 
   - 
   - 

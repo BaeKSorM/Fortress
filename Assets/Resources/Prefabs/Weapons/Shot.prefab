@@ -98,10 +98,11 @@ GameObject:
   m_Component:
   - component: {fileID: 4015157935635097681}
   - component: {fileID: 8645172805610435313}
-  - component: {fileID: 7750241499366024273}
+  - component: {fileID: 8150694506959045096}
   - component: {fileID: -4076254312665052555}
   - component: {fileID: 549117958867074364}
   - component: {fileID: 3768346356817382108}
+  - component: {fileID: 8683361705563384821}
   m_Layer: 9
   m_Name: Shot
   m_TagString: Weapon
@@ -177,7 +178,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &7750241499366024273
+--- !u!114 &8150694506959045096
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -278,3 +279,25 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &8683361705563384821
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6374049648550552176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0

@@ -21,7 +21,7 @@ public class Roller : Weapons
         capsuleCollider = GetComponent<CapsuleCollider2D>();
         player = GameObject.Find("Tank");
         polygonCollider = GameObject.Find("Ground").GetComponent<PolygonCollider2D>();
-        lookDirection = player.transform.localScale.x;
+        lookDirection = rigidbody.velocity.x > 0 ? 1 : -1;
     }
     void OnTriggerEnter2D(Collider2D other)
     {
