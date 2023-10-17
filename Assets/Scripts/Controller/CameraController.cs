@@ -10,9 +10,12 @@ public class CameraController : MonoBehaviour
     public float mapLeftMax;
     public float mapRightMax;
     public float sideBlock;
+    public float cameraMoveSpeed;
     void Start()
     {
         Instance = this;
+        Transform playerTransform = UIManager.Instance.tank.transform;
+        transform.position = new Vector3(playerTransform.position.x + 8 * playerTransform.localScale.x, 0, -10);
     }
     void Update()
     {
@@ -23,11 +26,11 @@ public class CameraController : MonoBehaviour
 
         if (Input.GetKey(cameraLeftKey) && transform.position.x > mapLeftMax + sideBlock)
         {
-            transform.position += new Vector3(-0.01f, 0, 0);
+            transform.position += new Vector3(-1f * cameraMoveSpeed * Time.deltaTime, 0, 0);
         }
         if (Input.GetKey(cameraRightKey) && transform.position.x < mapRightMax - sideBlock)
         {
-            transform.position += new Vector3(0.01f, 0, 0);
+            transform.position += new Vector3(1f * cameraMoveSpeed * Time.deltaTime, 0, 0);
         }
     }
 }

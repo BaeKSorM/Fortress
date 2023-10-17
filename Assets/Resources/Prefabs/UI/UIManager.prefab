@@ -45,16 +45,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2449d0a02c6670141a5924f6b0196144, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testImage: {fileID: 21300000, guid: 4de8604b853a53647ac50e12ed3d4a7a, type: 3}
   niddle: {fileID: 0}
   currentScene: 0
   selectedWeaponType: 0
-  weaponCounts: 
   selectedItemType: 0
   weaponOptions: {fileID: 0}
   itemOptions: {fileID: 0}
-  weapons: []
-  items: []
+  weapons:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  items:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   weaponsButton: {fileID: 0}
   itemsButton: {fileID: 0}
   gameStart: {fileID: 0}
@@ -71,15 +81,14 @@ MonoBehaviour:
   stats: {fileID: 0}
   restStats: {fileID: 0}
   restStatsCount: 3
-  restStatsMaxCount: 0
-  itemType: 0
+  restStatsMaxCount: 3
+  itemsCount: 010000000000000000000000
+  weaponsCount: 010000000a0000000a0000000a0000000a0000000a0000000a0000000a0000000a000000
   doubleShot: {fileID: 0}
-  doubleShotCount: 0
   doubleShotCounts: {fileID: 0}
   doubleShotPlus: {fileID: 0}
   doubleShotMinus: {fileID: 0}
   shield: {fileID: 0}
-  shieldCount: 0
   shieldCounts: {fileID: 0}
   shieldPlus: {fileID: 0}
   shieldMinus: {fileID: 0}
@@ -95,7 +104,8 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  mapName: {fileID: 0}
+  mapNameText: {fileID: 0}
+  mapName: 
   inviteKey: {fileID: 0}
   mapMaxPlayerText: {fileID: 0}
   mapNames:
@@ -106,7 +116,7 @@ MonoBehaviour:
   - Green
   - Blue
   - Red
-  mapMaxPlayerCounts: 020000000400000001000000
+  mapMaxPlayerCounts: 020000000000000001000000
   currentImageIndexes: 00000000000000000000000000000000000000000000000000000000
   currentImage:
   - {fileID: 0}
@@ -124,25 +134,38 @@ MonoBehaviour:
   cancelJoinRoomButton: {fileID: 0}
   roomKey: {fileID: 0}
   ConnectionStatus: {fileID: 0}
-  text: {fileID: 0}
   playerCannon: 
   playerTankTop: 
   playerTankBottom: 
   errorMessage: {fileID: 0}
   errorText: {fileID: 0}
   roomNames: []
+  readyPanel: {fileID: 0}
   tank: {fileID: 3338893564389526103, guid: a2caa350306c51b4f9bdfeafc0e50035, type: 3}
-  a: {fileID: 0}
-  spawnPoints:
-  - {x: -5, y: 1.8}
-  - {x: 5, y: 1.8}
+  GrassLand:
   - {x: -10.9, y: 1.8}
   - {x: 10.9, y: 1.8}
+  playerController: {fileID: 0}
+  windPowerText: {fileID: 0}
+  selectedWeapon: {fileID: 0}
+  selectedWeaponIcon: {fileID: 0}
+  selectedWeaponName: {fileID: 0}
+  selectedItem: {fileID: 0}
+  selectedItemIcon: {fileID: 0}
+  selectedItemName: {fileID: 0}
+  windDirectionImage: {fileID: 0}
+  wind: {fileID: 0}
+  myTankCannon: {fileID: 0}
+  myTankTop: {fileID: 0}
+  myTankBottom: {fileID: 0}
+  hpbar: {fileID: 0}
+  hp: {fileID: 0}
   loseButton: {fileID: 0}
   winButton: {fileID: 0}
   playerInfo: {fileID: 0}
   isSetButtons: 0
   playerOrder: 0
+  myturnPanel: {fileID: 0}
   playerActorNumbers: 
 --- !u!114 &6663224223332188567
 MonoBehaviour:

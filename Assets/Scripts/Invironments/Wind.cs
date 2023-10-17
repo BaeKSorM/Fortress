@@ -4,7 +4,12 @@ using UnityEngine;
 
 public class Wind : MonoBehaviour
 {
+    public static Wind Instance;
     public float windPower;
+    private void Start()
+    {
+        Instance = this;
+    }
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Weapon"))

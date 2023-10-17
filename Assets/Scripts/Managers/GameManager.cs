@@ -14,10 +14,6 @@ public class GameManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else
-        {
-            Destroy(gameObject);
-        }
     }
     void OnEnable()
     {
@@ -33,10 +29,8 @@ public class GameManager : MonoBehaviour
     }
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        Debug.Log(scene.buildIndex);
         if (scene.buildIndex == 1)
         {
-
             UIManager.Instance.currentScene = UIManager.CurrentScene.Ready;
             UIManager.Instance.InitializeReadySceneUI();
         }

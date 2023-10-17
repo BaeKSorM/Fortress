@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Weapons : MonoBehaviour
@@ -11,16 +10,19 @@ public class Weapons : MonoBehaviour
     public int damage;
     public int horizontalDivision;
     public int verticalDivision;
-    protected void Start()
+    void Awake()
     {
+        rigidbody = GetComponent<Rigidbody2D>();
         Instance = this;
         animator = GetComponent<Animator>();
-        rigidbody = GetComponent<Rigidbody2D>();
         explosionArea = transform.GetChild(0).gameObject;
+    }
+    protected void Start()
+    {
         switch (UIManager.Instance.selectedWeaponType)
         {
             case UIManager.SelectedWeaponType.Shot:
-                damage = 10;
+                damage = 20;
                 break;
             case UIManager.SelectedWeaponType.Three_Ball:
                 damage = 10;
@@ -29,28 +31,27 @@ public class Weapons : MonoBehaviour
                 damage = 20;
                 break;
             case UIManager.SelectedWeaponType.Roller:
-                damage = 25;
+                damage = 10;
                 break;
             case UIManager.SelectedWeaponType.Back_Roller:
-                damage = 25;
+                damage = 10;
                 break;
             case UIManager.SelectedWeaponType.Granade:
-                damage = 30;
+                damage = 20;
                 break;
             case UIManager.SelectedWeaponType.Spliter:
                 damage = 20;
                 break;
             case UIManager.SelectedWeaponType.Breaker:
-                damage = 15;
+                damage = 20;
                 break;
             case UIManager.SelectedWeaponType.Sniper:
-                damage = 100;
+                damage = 70;
                 break;
         }
     }
     void Update()
     {
-        transform.right = rigidbody.velocity;
     }
     public IEnumerator Explosion()
     {

@@ -21,9 +21,11 @@ public class Spliter : Weapons
         {
             canCopy = false;
             rigidbody.velocity = Vector2.zero;
-            GameObject clone = Instantiate(gameObject);
-            rigidbody.AddForce(Vector2.left * rotateAngle, ForceMode2D.Impulse);
-            clone.GetComponent<Rigidbody2D>().AddForce(Vector2.right * rotateAngle, ForceMode2D.Impulse);
+            GameObject leftClone = Instantiate(gameObject);
+            GameObject rightClone = Instantiate(gameObject);
+            leftClone.GetComponent<Rigidbody2D>().AddForce(Vector2.left * rotateAngle, ForceMode2D.Impulse);
+            rightClone.GetComponent<Rigidbody2D>().AddForce(Vector2.right * rotateAngle, ForceMode2D.Impulse);
+            Destroy(gameObject);
         }
         else if (!canSplit && !canCopy)
         {

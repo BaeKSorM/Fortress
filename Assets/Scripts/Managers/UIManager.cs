@@ -7,19 +7,17 @@ using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
 using System.Linq;
-using Unity.VisualScripting;
+using System.Reflection;
 
 public class UIManager : MonoBehaviourPunCallbacks
 {
     public static UIManager Instance;  // UIManager의 인스턴스를 관리합니다.
-    public Sprite testImage;
     // 게임 UI 요소
     public GameObject niddle;
     public enum CurrentScene { None, Ready, Game };  // 현재 장면 상태를 나타내는 열거형
     public CurrentScene currentScene;  // 현재 장면 상태 변수
     public enum SelectedWeaponType { Shot, Three_Ball, One_Bounce, Roller, Back_Roller, Granade, Spliter, Breaker, Sniper };  // 선택한 무기 유형
     public SelectedWeaponType selectedWeaponType;  // 선택한 무기 유형 변수
-    public List<int> weaponCounts;
     public enum SelectedItemType { None, Double, Shield };  // 선택한 아이템 유형
     public SelectedItemType selectedItemType;  // 선택한 아이템 유형 변수
 
@@ -48,8 +46,8 @@ public class UIManager : MonoBehaviourPunCallbacks
     public int restStatsCount;
     public int restStatsMaxCount;
     public enum ItemType { None, doubleShot, shield };
-    public ItemType itemType;
     public List<int> itemsCount;
+    public List<int> weaponsCount;
     public Transform doubleShot;
     public Transform doubleShotCounts;
     public Button doubleShotPlus;
@@ -64,7 +62,8 @@ public class UIManager : MonoBehaviourPunCallbacks
     public Button previousMapButton;  // 이전 맵 버튼
     public Button nextMapButton;  // 다음 맵 버튼
     public List<Button> tankImageChangeButtons;
-    public TMP_Text mapName;  // 맵 이름 텍스트
+    public TMP_Text mapNameText;  // 맵 이름 텍스트
+    public string mapName;  // 맵 이름 텍스트
     public TMP_Text inviteKey;
     public TMP_Text mapMaxPlayerText;  // 맵 최대 플레이어 수 텍스트
 
@@ -84,7 +83,6 @@ public class UIManager : MonoBehaviourPunCallbacks
     public Button cancelJoinRoomButton;  // 방 입장 취소 버튼
     public TMP_InputField roomKey;  // 방 키 입력 필드
     public TMP_Text ConnectionStatus;  // 연결 상태 텍스트
-    public TMP_Text text;
 
     // 기타 변수들
     #region 
@@ -105,8 +103,12 @@ public class UIManager : MonoBehaviourPunCallbacks
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
-
+    public GameObject readyPanel;
     // Ready 장면 UI 초기화 함수
     public void InitializeReadySceneUI()
     {
@@ -125,6 +127,8 @@ public class UIManager : MonoBehaviourPunCallbacks
 
 
         lobby = GameObject.Find("Lobby").transform;
+        readyPanel = GameObject.Find("ReadyPanel");
+        readyPanel.SetActive(false);
         makeRoomButton = lobby.transform.Find("MakeRoomButton").GetComponent<Button>();
         joinRoomButton = lobby.transform.Find("JoinRoomButton").GetComponent<Button>();
         joinRandomRoomButton = lobby.transform.Find("JoinRandomRoomButton").GetComponent<Button>();
@@ -143,19 +147,16 @@ public class UIManager : MonoBehaviourPunCallbacks
         insertRooomKey.gameObject.SetActive(false);
         errorMessage.SetActive(false);
 
-
         roomUI = GameObject.Find("RoomUI").transform;
-
 
         players = roomUI.Find("Players");
         content = players.GetChild(0).GetChild(0).GetChild(0);
-
 
         maps = roomUI.Find("Maps");
         currentImage[3] = maps.GetComponent<Image>();
         infomationBG = maps.Find("InfomationBG");
         buttons = maps.Find("Buttons");
-        mapName = infomationBG.Find("MapName").GetComponent<TMP_Text>();
+        mapNameText = infomationBG.Find("MapName").GetComponent<TMP_Text>();
         mapMaxPlayerText = infomationBG.Find("MaxPlayerCount").GetComponent<TMP_Text>();
         inviteKey = infomationBG.Find("InviteKey").GetComponent<TMP_Text>();
         previousMapButton = buttons.Find("Previous").GetComponent<Button>();
@@ -163,12 +164,10 @@ public class UIManager : MonoBehaviourPunCallbacks
         nextMapButton = buttons.Find("Next").GetComponent<Button>();
         nextMapButton.onClick.AddListener(() => PhotonNextImage(mapNames, currentImageIndexes[3], 3, 0));
 
-
         custom = roomUI.Find("Custom");
         currentImage[4] = custom.Find("TankCannonImage").GetComponent<Image>();
         currentImage[5] = custom.Find("TankTopImage").GetComponent<Image>();
         currentImage[6] = custom.Find("TankBottomImage").GetComponent<Image>();
-
 
         stats = roomUI.Find("Stats");
         restStats = stats.GetChild(0).GetComponent<TMP_Text>();
@@ -186,28 +185,56 @@ public class UIManager : MonoBehaviourPunCallbacks
         shieldMinus.onClick.AddListener(() => SubtractStat(ItemType.shield));
         restStatsCount = restStatsMaxCount;
 
+        readiedPlayerCount = 1;
+
+        isSetButtons = false;
+
+        for (int i = 0; i < currentImageIndexes.Count; ++i)
+        {
+            currentImageIndexes[i] = 0;
+        }
         if (!photonView.IsMine)
         {
+            Debug.Log("!0");
             ReadyCancelGame();
         }
         roomUI.gameObject.SetActive(false);
         lobby.gameObject.SetActive(true);
-        if (PhotonNetwork.InRoom)
-        {
-            PhotonNetwork.LeaveRoom();
-        }
     }
     public GameObject tank;
-    public GameObject a;
-    public List<Vector2> spawnPoints = new() { new(-10.9f, 1.8f), new(10.9f, 1.8f) };
+    List<Vector2> mapSpawnPoints = new();
+    public List<Vector2> GrassLand = new() { new(-10.9f, 1.8f), new(10.9f, 1.8f) };
+    public PlayerController playerController;
+    public TMP_Text windPowerText;
+    public GameObject selectedWeapon;
+    public Image selectedWeaponIcon;
+    public TMP_Text selectedWeaponName;
+    public GameObject selectedItem;
+    public Image selectedItemIcon;
+    public TMP_Text selectedItemName;
+    public Image windDirectionImage;
+    public Wind wind;
+    public Image myTankCannon;
+    public Image myTankTop;
+    public Image myTankBottom;
+    public Slider hpbar;
+    public TMP_Text hp;
     // Game 장면 UI 초기화 함수
     public void InitializeGameSceneUI()
     {
         // 게임 장면의 UI를 초기화합니다.
         // Prefabs / UI / PlayerInfomation;
         // PlayerInfomation
-        tank = PhotonNetwork.Instantiate("Prefabs/Tanks/" + playerCannon + playerTankTop + playerTankBottom + "Tank", spawnPoints[playerOrder], Quaternion.identity);
+        switch (mapName)
+        {
+            case "GrassLand":
+                mapSpawnPoints = GrassLand;
+                break;
 
+        }
+        string spawnTankName = "Prefabs/Tanks/" + playerCannon + playerTankTop + playerTankBottom + "Tank";
+        tank = PhotonNetwork.Instantiate(spawnTankName, mapSpawnPoints[playerOrder], Quaternion.identity);
+        playerController = tank.GetComponent<PlayerController>();
         // photonView.RPC("SetPlayerCustoms", RpcTarget.All, playerCannon, playerTankTop, playerTankBottom);
         if (tank.transform.position.x > 0)
         {
@@ -215,26 +242,49 @@ public class UIManager : MonoBehaviourPunCallbacks
             tank.GetComponent<PlayerController>().facingDirection = -1;
             tank.GetComponent<PlayerController>().lookPosition = -1;
         }
+
+        myTankCannon = GameObject.Find("TankCannonImage").GetComponent<Image>();
+        myTankTop = GameObject.Find("TankTopImage").GetComponent<Image>();
+        myTankBottom = GameObject.Find("TankBottomImage").GetComponent<Image>();
+        myTankCannon.sprite = Resources.LoadAll<Sprite>("Images/Tanks/" + playerCannon)[0];
+        myTankTop.sprite = Resources.LoadAll<Sprite>("Images/Tanks/" + playerTankTop)[1];
+        myTankBottom.sprite = Resources.LoadAll<Sprite>("Images/Tanks/" + playerTankBottom)[2];
         niddle = GameObject.Find("Niddle");
+        windPowerText = GameObject.Find("Cloud").transform.GetChild(0).GetComponent<TMP_Text>();
         weaponOptions = GameObject.Find("WeaponOptions").transform;
         itemOptions = GameObject.Find("ItemOptions").transform;
         weaponsButton = GameObject.Find("Weapons").GetComponent<Button>();
         itemsButton = GameObject.Find("Items").GetComponent<Button>();
         weaponsButton.onClick.AddListener(WeaponOptions);
         itemsButton.onClick.AddListener(ItemOptions);
+        selectedWeapon = GameObject.Find("selectedWeapon");
+        selectedWeaponName = selectedWeapon.transform.GetChild(0).GetComponent<TMP_Text>();
+        selectedWeaponIcon = selectedWeapon.transform.GetChild(1).GetComponent<Image>();
+        selectedItem = GameObject.Find("selectedItem");
+        selectedItemName = selectedItem.transform.GetChild(0).GetComponent<TMP_Text>();
+        selectedItemIcon = selectedItem.transform.GetChild(1).GetComponent<Image>();
+        windDirectionImage = GameObject.Find("Cloud").GetComponent<Image>();
+        turnPanel = GameObject.Find("Turn");
+        turnPanel.SetActive(false);
+        hpbar = GameObject.Find("HpBar").GetComponent<Slider>();
+        hpbar.maxValue = playerController.maxHp;
+        hpbar.value = hpbar.maxValue;
+        hp = hpbar.transform.GetChild(2).GetComponent<TMP_Text>();
+        wind = GameObject.Find("Wind").GetComponent<Wind>();
         for (int i = 0; i < weaponOptions.childCount; ++i)
         {
             int count = i;
-            weapons.Add(weaponOptions.GetChild(i).GetComponent<Button>());
+            weapons[i] = weaponOptions.GetChild(i).GetComponent<Button>();
             if (i > 0)
             {
-                if (int.Parse(weapons[i].transform.GetChild(1).GetComponent<TMP_Text>().text) == 0)
+                if (weaponsCount[i] == 0)
                 {
                     weapons[i].gameObject.SetActive(false);
                 }
-                weapons[i].onClick.AddListener(() => SetWeapon(count));
-                weapons[i].onClick.AddListener(WeaponOptions);
+                weapons[i].transform.GetChild(1).GetComponent<TMP_Text>().text = weaponsCount[i].ToString();
             }
+            weapons[i].onClick.AddListener(() => SetWeapon(count));
+            weapons[i].onClick.AddListener(WeaponOptions);
         }
         WeaponOptions();
         for (int i = 0; i < itemOptions.childCount; ++i)
@@ -248,13 +298,16 @@ public class UIManager : MonoBehaviourPunCallbacks
             {
                 count = 2;
             }
-            Debug.Log(count);
-            items.Add(itemOptions.GetChild(i).GetComponent<Button>());
-            items[i].transform.GetChild(1).GetComponent<TMP_Text>().text = itemsCount[i].ToString();
-            if (int.Parse(items[i].transform.GetChild(1).GetComponent<TMP_Text>().text) == 0)
+            items[i] = itemOptions.GetChild(i).GetComponent<Button>();
+            if (i > 0)
             {
-                items[i].gameObject.SetActive(false);
+                if (itemsCount[i] == 0)
+                {
+                    items[i].gameObject.SetActive(false);
+                }
+                items[i].transform.GetChild(1).GetComponent<TMP_Text>().text = itemsCount[i].ToString();
             }
+
             items[i].onClick.AddListener(() => SetItem(count));
             items[i].onClick.AddListener(ItemOptions);
         }
@@ -277,17 +330,19 @@ public class UIManager : MonoBehaviourPunCallbacks
         }
         else if (readiedPlayerCount > mapMaxPlayerCount)
         {
-            StartCoroutine(ErrorMessage("Too Many Players \nHave Pressed Ready"));
+            errorMessage.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta = new Vector2(1280, 355);
+            StartCoroutine(ErrorMessage("Too Many Players \nAre Ready"));
         }
         else if (readiedPlayerCount < mapMaxPlayerCount)
         {
+            errorMessage.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta = new Vector2(1280, 355);
             StartCoroutine(ErrorMessage("Not All Players \nHave Pressed Ready"));
         }
     }
     [PunRPC]
     void SavePlayerColor()
     {
-        SceneManager.LoadSceneAsync(mapName.text);
+        SceneManager.LoadSceneAsync(mapNameText.text);
         string cannon = currentImage[4].GetComponent<Image>().sprite.name;
         int cannonIdx = cannon.IndexOf("_");
         cannon = cannon.Substring(0, cannonIdx);
@@ -300,29 +355,37 @@ public class UIManager : MonoBehaviourPunCallbacks
         playerCannon = cannon;
         playerTankTop = top;
         playerTankBottom = bottom;
+        mapName = mapNameText.text;
         PlayerPrefs.SetString("PlayerCannon", playerCannon);
         PlayerPrefs.SetString("PlayerTankTop", playerTankTop);
         PlayerPrefs.SetString("PlayerTankBottom", playerTankBottom);
-        Debug.Log(playerCannon);
-        Debug.Log(PlayerPrefs.GetString("PlayerCannon"));
-        Debug.Log(playerCannon);
     }
     void ReadyGame()
     {
-        photonView.RPC("RefreshReadiedPlayer", RpcTarget.All, 1);
+        photonView.RPC("RefreshReadiedPlayer", RpcTarget.All, 1, playerOrder);
         gameReady.gameObject.SetActive(false);
         gameReadyCancel.gameObject.SetActive(true);
+        readyPanel.SetActive(true);
+        if (playerOrder != 0)
+        {
+            gameQuit.gameObject.SetActive(false);
+        }
     }
     void ReadyCancelGame()
     {
-        photonView.RPC("RefreshReadiedPlayer", RpcTarget.All, -1);
+        photonView.RPC("RefreshReadiedPlayer", RpcTarget.All, -1, playerOrder);
         gameReady.gameObject.SetActive(true);
         gameReadyCancel.gameObject.SetActive(false);
+        readyPanel.SetActive(false);
     }
-    void QuitGame()
+    public void QuitGame()
     {
-        PhotonNetwork.LeaveRoom();
+        if (PhotonNetwork.InRoom)
+        {
+            PhotonNetwork.LeaveRoom();
+        }
         roomUI.gameObject.SetActive(false);
+        readyPanel.SetActive(false);
         isSetButtons = false;
     }
     void AddStat(ItemType itemType)
@@ -330,16 +393,16 @@ public class UIManager : MonoBehaviourPunCallbacks
         switch (itemType)
         {
             case ItemType.doubleShot:
-                if (restStatsCount > 0 && itemsCount[0] < doubleShotCounts.childCount)
+                if (restStatsCount > 0 && itemsCount[1] < doubleShotCounts.childCount)
                 {
-                    doubleShotCounts.GetChild(itemsCount[0]++).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/UI/StatFilled");
+                    doubleShotCounts.GetChild(itemsCount[1]++).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/UI/StatFilled");
                     restStats.text = "Rest Stats : " + --restStatsCount;
                 }
                 break;
             case ItemType.shield:
-                if (restStatsCount > 0 && itemsCount[1] < shieldCounts.childCount)
+                if (restStatsCount > 0 && itemsCount[2] < shieldCounts.childCount)
                 {
-                    shieldCounts.GetChild(itemsCount[1]++).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/UI/StatFilled");
+                    shieldCounts.GetChild(itemsCount[2]++).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/UI/StatFilled");
                     restStats.text = "Rest Stats : " + --restStatsCount;
                 }
                 break;
@@ -352,16 +415,16 @@ public class UIManager : MonoBehaviourPunCallbacks
         switch (itemType)
         {
             case ItemType.doubleShot:
-                if (restStatsCount < restStatsMaxCount && itemsCount[0] > 0)
+                if (restStatsCount < restStatsMaxCount && itemsCount[1] > 0)
                 {
-                    doubleShotCounts.GetChild(--itemsCount[0]).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/UI/StatUnFilled");
+                    doubleShotCounts.GetChild(--itemsCount[1]).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/UI/StatUnFilled");
                     restStats.text = "Rest Stats : " + ++restStatsCount;
                 }
                 break;
             case ItemType.shield:
-                if (restStatsCount < restStatsMaxCount && itemsCount[1] > 0)
+                if (restStatsCount < restStatsMaxCount && itemsCount[2] > 0)
                 {
-                    shieldCounts.GetChild(--itemsCount[1]).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/UI/StatUnFilled");
+                    shieldCounts.GetChild(--itemsCount[2]).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/UI/StatUnFilled");
                     restStats.text = "Rest Stats : " + ++restStatsCount;
                 }
                 break;
@@ -370,9 +433,17 @@ public class UIManager : MonoBehaviourPunCallbacks
         }
     }
     [PunRPC]
-    public void RefreshReadiedPlayer(int plusMinus)
+    public void RefreshReadiedPlayer(int plusMinus, int readiedPlayerOrder)
     {
         readiedPlayerCount += plusMinus;
+        if (plusMinus > 0)
+        {
+            content.GetChild(readiedPlayerOrder).GetChild(3).GetChild(0).gameObject.SetActive(true);
+        }
+        else if (readiedPlayerOrder > 0)
+        {
+            content.GetChild(readiedPlayerOrder).GetChild(3).GetChild(0).gameObject.SetActive(false);
+        }
     }
     // OpenWeaponOptions 함수: 무기 옵션 메뉴 열기
     void WeaponOptions()
@@ -381,9 +452,10 @@ public class UIManager : MonoBehaviourPunCallbacks
         {
             weaponOptions.gameObject.SetActive(false);
         }
-        else
+        else if (playerController.myTurn)
         {
             weaponOptions.gameObject.SetActive(true);
+            itemOptions.gameObject.SetActive(false);
         }
     }
 
@@ -393,9 +465,10 @@ public class UIManager : MonoBehaviourPunCallbacks
         {
             itemOptions.gameObject.SetActive(false);
         }
-        else
+        else if (playerController.myTurn)
         {
             itemOptions.gameObject.SetActive(true);
+            weaponOptions.gameObject.SetActive(false);
         }
     }
 
@@ -403,10 +476,22 @@ public class UIManager : MonoBehaviourPunCallbacks
     void SetWeapon(int _count)
     {
         selectedWeaponType = (SelectedWeaponType)_count;
+        selectedWeaponIcon.sprite = weaponOptions.GetChild(_count).GetChild(2).GetComponent<Image>().sprite;
+        selectedWeaponName.text = weaponOptions.GetChild(_count).GetChild(0).GetComponent<TMP_Text>().text;
     }
     void SetItem(int _count)
     {
         selectedItemType = (SelectedItemType)_count;
+        if (_count != 0)
+        {
+            selectedItemIcon.sprite = itemOptions.GetChild(_count).GetChild(2).GetComponent<Image>().sprite;
+            selectedItemName.text = itemOptions.GetChild(_count).GetChild(0).GetComponent<TMP_Text>().text;
+        }
+        else
+        {
+            selectedItemIcon.sprite = itemOptions.GetChild(0).GetChild(2).GetComponent<Image>().sprite;
+            selectedItemName.text = "None";
+        }
     }
     // DecreaseWeaponCount 함수: 무기 개수 감소
     public void DecreaseWeaponCount(int weaponType)
@@ -417,7 +502,7 @@ public class UIManager : MonoBehaviourPunCallbacks
             if (currentWeaponCount - 1 == 0)
             {
                 weapons[weaponType].gameObject.SetActive(false);
-                selectedWeaponType = SelectedWeaponType.Shot;
+                SetWeapon(0);
             }
             weapons[weaponType].transform.GetChild(1).GetComponent<TMP_Text>().text = (--currentWeaponCount).ToString();
         }
@@ -426,16 +511,29 @@ public class UIManager : MonoBehaviourPunCallbacks
     {
         if (itemType != 0)
         {
-            int currentItemCount = int.Parse(weapons[itemType - 1].transform.GetChild(1).GetComponent<TMP_Text>().text);
+            int currentItemCount = int.Parse(items[itemType].transform.GetChild(1).GetComponent<TMP_Text>().text);
             if (currentItemCount - 1 == 0)
             {
-                items[itemType - 1].gameObject.SetActive(false);
+                items[itemType].gameObject.SetActive(false);
+                SetItem(0);
             }
-            items[itemType - 1].transform.GetChild(1).GetComponent<TMP_Text>().text = (--currentItemCount).ToString();
+            if (itemType == 2 || !playerController.shield.activeSelf)
+            {
+                items[itemType].transform.GetChild(1).GetComponent<TMP_Text>().text = (--currentItemCount).ToString();
+                selectedItemIcon.sprite = itemOptions.GetChild(0).GetChild(2).GetComponent<Image>().sprite;
+                selectedItemName.text = "None";
+            }
         }
     }
     // PreviousImage 함수: 이전 이미지로 변경
-
+    public void SetPlayerHp(int currentHp, GameObject gameObject)
+    {
+        if (gameObject == tank)
+        {
+            hpbar.value = currentHp;
+            hp.text = $"{currentHp}/{playerController.maxHp}";
+        }
+    }
     public void PhotonPreviousImage(List<string> imageNames, int _currentImageIndex, int changingImageIndex, int type)
     {
         string imagePath;
@@ -462,7 +560,6 @@ public class UIManager : MonoBehaviourPunCallbacks
     }
     public void PreviousImage(List<string> imageNames, int _currentImageIndex, int changingImageIndex, int type)
     {
-        Debug.Log("P");
         string imagePath = "";
         if (_currentImageIndex - 1 < 0)
         {
@@ -487,7 +584,6 @@ public class UIManager : MonoBehaviourPunCallbacks
     // 이미지이름들(포, 상단, 하단), 현재 색 번호, 바뀔이미지 번호(탱크, 맵)
     public void PhotonNextImage(List<string> imageNames, int _currentImageIndex, int changingImageIndex, int type)
     {
-        Debug.Log(_currentImageIndex + 1);
         string imagePath = "";
         if (_currentImageIndex + 1 > imageNames.Count - 1)
         {
@@ -512,7 +608,6 @@ public class UIManager : MonoBehaviourPunCallbacks
     }
     public void NextImage(List<string> imageNames, int _currentImageIndex, int changingImageIndex, int type)
     {
-        Debug.Log("N");
         string imagePath = "";
         if (_currentImageIndex + 1 > imageNames.Count - 1)
         {
@@ -551,17 +646,15 @@ public class UIManager : MonoBehaviourPunCallbacks
     [PunRPC]
     public void RefreshMapInfo(int _currentImageIndex)
     {
-        mapName.text = mapNames[_currentImageIndex];
+        mapNameText.text = mapNames[_currentImageIndex];
         mapMaxPlayerText.text = "MaxPlayers : " + mapMaxPlayerCounts[_currentImageIndex];
     }
     public override void OnConnectedToMaster()
     {
-        Debug.Log("서버 연결");
         PhotonNetwork.JoinLobby();
     }
     public override void OnJoinedLobby()
     {
-        Debug.Log("로비 연결");
     }
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
@@ -572,7 +665,6 @@ public class UIManager : MonoBehaviourPunCallbacks
     {
         string roomName = RandomRoomName(roomNameLength);
         PhotonNetwork.CreateRoom(roomName);
-        Debug.Log("방 생성");
     }
 
     // JoinRoom 함수: 방 입장
@@ -595,10 +687,14 @@ public class UIManager : MonoBehaviourPunCallbacks
         }
         else
         {
+            errorMessage.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta = new Vector2(1280, 255);
             StartCoroutine(ErrorMessage("This Key Is Not Exist"));
         }
     }
-
+    public override void OnLeftRoom()
+    {
+        // Destroy(gameObject);
+    }
     // InsertRoomKeyCancel 함수: 방 키 입력 취소
     public void InsertRoomKeyCancel()
     {
@@ -645,7 +741,6 @@ public class UIManager : MonoBehaviourPunCallbacks
     public GameObject playerInfo;
     public override void OnJoinedRoom()
     {
-        Debug.Log("방연결");
         inviteKey.text = "Invite : " + PhotonNetwork.CurrentRoom.Name;
         roomUI.gameObject.SetActive(true);
         string cannon = currentImage[4].GetComponent<Image>().sprite.name;
@@ -659,27 +754,117 @@ public class UIManager : MonoBehaviourPunCallbacks
         bottom = bottom.Substring(0, bottomIdx);
         photonView.RPC("SettingPlayerInfo", RpcTarget.AllBufferedViaServer, cannon, top, bottom);
 
-        if (!photonView.IsMine)
-        {
-            buttons.gameObject.SetActive(false);
-            gameStart.gameObject.SetActive(false);
-            gameReady.gameObject.SetActive(true);
-        }
-        else
-        {
-            currentImage[3].sprite = Resources.Load<Sprite>("images/Backgrounds/" + mapNames[0]);
-            gameStart.gameObject.SetActive(true);
-            gameReady.gameObject.SetActive(false);
-        }
+
         gameReadyCancel.gameObject.SetActive(false);
         playerActorNumbers.Add(PhotonNetwork.LocalPlayer.ActorNumber);
         photonView.RPC("RefreshPlayerInfo", RpcTarget.AllViaServer);
     }
     public bool isSetButtons;
     public int playerOrder;
+    public void TurnEnd()
+    {
+        selectedItemType = SelectedItemType.None;
+        if (!playerController.gameEnd)
+        {
+            int randomValue = Random.Range(0, 1000);
+            if (randomValue < 100)
+            {
+                randomValue = Random.Range(-10, 10 + 1);
+            }
+            else if (randomValue < 200)
+            {
+                randomValue = Random.Range(-15, 15 + 1);
+            }
+            else if (randomValue < 500)
+            {
+                randomValue = Random.Range(-30, 30 + 1);
+            }
+            else if (randomValue < 700)
+            {
+                randomValue = Random.Range(-35, 35 + 1);
+            }
+            else if (randomValue < 950)
+            {
+                randomValue = Random.Range(-40, 40 + 1);
+            }
+            else if (randomValue < 980)
+            {
+                randomValue = Random.Range(-45, 45 + 1);
+            }
+            else if (randomValue < 995)
+            {
+                randomValue = Random.Range(-50, 50 + 1);
+            }
+            else
+            {
+                randomValue = Random.Range(-60, 60 + 1);
+            }
+            photonView.RPC("WindChange", RpcTarget.All, randomValue);
+            photonView.RPC("NextTurn", RpcTarget.All, playerOrder + 1);
+        }
+    }
+    [PunRPC]
+    public void WindChange(int randomValue)
+    {
+        wind.windPower = (float)randomValue / 10;
+        if (randomValue > 0)
+        {
+            windDirectionImage.sprite = Resources.LoadAll<Sprite>("Images/windDirection")[1];
+        }
+        else if (randomValue < 0)
+        {
+            windDirectionImage.sprite = Resources.LoadAll<Sprite>("Images/windDirection")[2];
+        }
+        else
+        {
+            windDirectionImage.sprite = Resources.LoadAll<Sprite>("Images/windDirection")[0];
+        }
+        windPowerText.text = randomValue.ToString();
+    }
+    [PunRPC]
+    public void NextTurn(int currentTurn)
+    {
+        StartCoroutine(Turn(currentTurn));
+    }
+    public GameObject turnPanel;
+    IEnumerator Turn(int currentTurn)
+    {
+        if (currentTurn == PhotonNetwork.CurrentRoom.PlayerCount)
+        {
+            if (playerOrder == 0)
+            {
+                turnPanel.transform.GetChild(0).GetComponent<TMP_Text>().text = "나의 턴";
+                playerController.myTurn = true;
+            }
+            else
+            {
+                turnPanel.transform.GetChild(0).GetComponent<TMP_Text>().text = $"{currentTurn - 1}번째 플레이어턴";
+                playerController.myTurn = false;
+            }
+        }
+        else if (currentTurn == playerOrder)
+        {
+            turnPanel.transform.GetChild(0).GetComponent<TMP_Text>().text = "나의 턴";
+            playerController.myTurn = true;
+        }
+        else
+        {
+            turnPanel.transform.GetChild(0).GetComponent<TMP_Text>().text = $"{currentTurn + 1}번째 플레이어턴";
+            playerController.myTurn = false;
+        }
+        turnPanel.SetActive(true);
+        yield return new WaitForSeconds(1.0f);
+        turnPanel.SetActive(false);
+        yield return null;
+    }
     public void SetPhotonButtons()
     {
         playerOrder = content.childCount - 1;
+        Debug.Log(playerOrder);
+        if (playerOrder != 0)
+        {
+            photonView.RPC("RefreshReadiedPlayer", RpcTarget.All, 0, playerOrder);
+        }
         for (int i = 0; i < tankImageChangeButtons.Count; i += 2)
         {
             int count = i / 2;
@@ -689,6 +874,22 @@ public class UIManager : MonoBehaviourPunCallbacks
             tankImageChangeButtons[i + 1] = currentImage[count + 4].transform.Find("Next").GetComponent<Button>();
             tankImageChangeButtons[i + 1].onClick.AddListener(() => PhotonNextImage(tankNames, currentImageIndexes[count], count, count));
             tankImageChangeButtons[i + 1].onClick.AddListener(() => NextImage(tankNames, currentImageIndexes[count + 4], count + 4, count));
+        }
+        if (playerOrder > 0)
+        {
+            Debug.Log("!1");
+            buttons.gameObject.SetActive(false);
+            gameStart.gameObject.SetActive(false);
+            gameReady.gameObject.SetActive(true);
+        }
+        else
+        {
+            Debug.Log("1");
+            currentImage[3].sprite = Resources.Load<Sprite>("images/Backgrounds/" + mapNames[0]);
+            mapName = mapNames[0];
+            mapMaxPlayerText.text = $"MaxPlayers : {mapMaxPlayerCounts[0]}";
+            gameStart.gameObject.SetActive(true);
+            gameReady.gameObject.SetActive(false);
         }
         isSetButtons = true;
     }
@@ -704,17 +905,15 @@ public class UIManager : MonoBehaviourPunCallbacks
     }
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        Debug.Log(otherPlayer.ActorNumber);
         switch (currentScene)
         {
             case CurrentScene.Ready:
+                Debug.Log("left");
                 for (int i = 0; i < PhotonNetwork.CurrentRoom.PlayerCount + 1; ++i)
                 {
                     if (playerActorNumbers[i] == otherPlayer.ActorNumber)
                     {
                         PhotonNetwork.Destroy(content.GetChild(i).gameObject);
-                        Debug.Log(playerOrder);
-                        Debug.Log(i + 1);
                         if (playerOrder > i)
                         {
                             --playerOrder;
@@ -725,9 +924,12 @@ public class UIManager : MonoBehaviourPunCallbacks
                 }
                 if (photonView.IsMine)
                 {
+                    Debug.Log("2");
+                    playerOrder = 0;
                     if (gameReadyCancel.gameObject.activeSelf)
                     {
-                        photonView.RPC("RefreshReadiedPlayer", RpcTarget.All, -1);
+                        photonView.RPC("RefreshReadiedPlayer", RpcTarget.All, -1, -1);
+                        readyPanel.SetActive(false);
                         gameReadyCancel.gameObject.SetActive(false);
                     }
                     else if (gameReady.gameObject.activeSelf)
@@ -738,9 +940,14 @@ public class UIManager : MonoBehaviourPunCallbacks
                     {
                         gameStart.gameObject.SetActive(true);
                     }
+                    buttons.gameObject.SetActive(true);
                 }
                 break;
             case CurrentScene.Game:
+                if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
+                {
+                    playerController.GameEnd();
+                }
                 break;
         }
     }
@@ -750,6 +957,7 @@ public class UIManager : MonoBehaviourPunCallbacks
         playerActorNumbers.Add(newPlayer.ActorNumber);
         if (photonView.IsMine)
         {
+            Debug.Log("3");
             photonView.RPC("SetPlayerActorNumbers", RpcTarget.All, playerActorNumbers.ToArray());
             for (int i = 0; i < content.childCount; ++i)
             {
@@ -764,9 +972,16 @@ public class UIManager : MonoBehaviourPunCallbacks
                 bottom = bottom.Substring(0, bottomIdx);
                 photonView.RPC("SetOriginPlayerImages", newPlayer, i, cannon, top, bottom);
             }
-            int mapMaxPlayersIdx = mapNames.IndexOf(mapName.text);
-            photonView.RPC("SetMapImage", newPlayer, mapName.text, mapMaxPlayersIdx);
+            int mapMaxPlayersIdx = mapNames.IndexOf(mapNameText.text);
+            photonView.RPC("SetMapImage", newPlayer, mapNameText.text, mapMaxPlayersIdx);
         }
+    }
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        isSetButtons = false;
+        SceneManager.LoadSceneAsync("LobbyScene");
+        // PhotonNetwork.Destroy(tank);
     }
     [PunRPC]
     public void SetPlayerActorNumbers(int[] currentPlayerNumbers)
@@ -781,16 +996,15 @@ public class UIManager : MonoBehaviourPunCallbacks
         content.GetChild(playerInfoCount).GetChild(2).GetChild(2).GetComponent<Image>().sprite = Resources.LoadAll<Sprite>("Images/Tanks/" + bottomName)[2];
     }
     [PunRPC]
-    public void SetMapImage(string mapNameText, int _mapMaxPlayersIdx)
+    public void SetMapImage(string mapName, int _mapMaxPlayersIdx)
     {
-        currentImage[3].sprite = Resources.Load<Sprite>("Images/Backgrounds/" + mapNameText);
-        mapName.text = mapNameText;
+        currentImage[3].sprite = Resources.Load<Sprite>("Images/Backgrounds/" + mapName);
+        mapNameText.text = mapName;
         mapMaxPlayerText.text = "MaxPlayers : " + mapMaxPlayerCounts[_mapMaxPlayersIdx];
     }
     [PunRPC]
     public void RefreshPlayerInfo()
     {
-        // Debug.Log(content.childCount);
         for (int i = 0; i < content.childCount; ++i)
         {
             if (content.GetChild(i).GetComponent<PlayerInfomation>().playerOrder)
@@ -820,9 +1034,16 @@ public class UIManager : MonoBehaviourPunCallbacks
                     }
                     if (content.childCount == int.Parse(content.GetChild(content.childCount - 1).GetComponent<PlayerInfomation>().playerOrder.text) && !isSetButtons && PhotonNetwork.InRoom)
                     {
-                        // Debug.Log(int.Parse(content.GetChild(content.childCount - 1).GetComponent<PlayerInfomation>().playerOrder.text));
                         isSetButtons = false;
                         SetPhotonButtons();
+                    }
+                    if (photonView.IsMine)
+                    {
+                        Debug.Log("4");
+                        if (!content.GetChild(0).GetChild(3).GetChild(0).gameObject.activeSelf)
+                        {
+                            content.GetChild(0).GetChild(3).GetChild(0).gameObject.SetActive(true);
+                        }
                     }
                 }
                 break;
@@ -831,10 +1052,49 @@ public class UIManager : MonoBehaviourPunCallbacks
                 {
                     tank.GetComponent<PlayerController>().canMove = false;
                 }
+                if (playerController.gameEnd)
+                {
+                    if (PhotonNetwork.InRoom)
+                    {
+                        if (tank.GetComponent<PlayerController>().hpBar.value <= 0)
+                        {
+                            loseButton.SetActive(true);
+                            loseButton.GetComponent<Button>().onClick.AddListener(NextGame);
+                        }
+                        else
+                        {
+                            winButton.SetActive(true);
+                            winButton.GetComponent<Button>().onClick.AddListener(NextGame);
+                        }
+                        playerActorNumbers = new List<int>();
+                        for (int i = 1; i < itemsCount.Count; ++i)
+                        {
+                            itemsCount[i] = 0;
+                        }
+                        PhotonNetwork.CurrentRoom.IsOpen = false;
+                        PhotonNetwork.CurrentRoom.IsVisible = false;
+                        roomNames.Remove(PhotonNetwork.CurrentRoom.Name);
+                        PhotonNetwork.LeaveRoom();
+                        Debug.Log(playerController.gameEnd);
+                    }
+                }
+                if (playerOrder == 0 && !photonView.IsMine)
+                {
+                    photonView.IsMine = true;
+                }
+                if (playerOrder != 0 && photonView.IsMine)
+                {
+                    photonView.IsMine = false;
+                }
                 break;
             default:
                 break;
         }
     }
-
+    public void NextGame()
+    {
+        isSetButtons = false;
+        SceneManager.LoadSceneAsync("LobbyScene");
+        // PhotonNetwork.Destroy(gameObject);
+    }
 }

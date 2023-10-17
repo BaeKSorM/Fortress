@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class PlayerController : MonoBehaviourPun
 {
@@ -17,7 +18,6 @@ public class PlayerController : MonoBehaviourPun
     public GameObject cannon;
     public GameObject chargingGauge;
     public Slider chargingGaugeBar;
-
     public float movementSpeed;
     public float moveAddAngle;
     public float groundCheckRadius;
@@ -56,9 +56,12 @@ public class PlayerController : MonoBehaviourPun
     public float setScale;
     public float threeBallAngle;
     public int lookPosition = 1;
+    public int cannonMoveSpeed;
+    public int maxHp;
     public PhotonView PV;
     public void Awake()
     {
+
     }
     void Start()
     {
@@ -76,31 +79,60 @@ public class PlayerController : MonoBehaviourPun
         chargingMax = chargingGaugeBar.maxValue;
         setScale = transform.localScale.x > 0 ? transform.localScale.x : -transform.localScale.x;
         rigidbody.constraints = RigidbodyConstraints2D.FreezePositionX;
-        // if (UIManager.Instance.playerOrder == 0)
-        // {
-        //     myTurn = true;
-        // }
-        // else
-        // {
-        //     myTurn = false;
-        // }
+        shield = transform.GetChild(2).gameObject;
+        hpBar = transform.GetChild(0).GetChild(0).GetComponent<Slider>();
+        hpBar.maxValue = maxHp;
+        if (UIManager.Instance.playerOrder == 0)
+        {
+            myTurn = true;
+        }
+        else
+        {
+            myTurn = false;
+        }
     }
-
     void Update()
     {
         if (!PV.IsMine)
             return;
-        Turn();
+
         if (Input.anyKey)
         {
             PressingKey();
         }
+        Turn();
         CannonMove();
         RotateFloorAngle();
         Charging();
+        if (isShooted && weaponClone == null)
+        {
+            StartCoroutine(TurnEndCheck());
+            isShooted = false;
+        }
+    }
+    public bool isShooted;
+    IEnumerator TurnEndCheck()
+    {
+        float timer = 0;
+        while (timer < 2.0f)
+        {
+            timer += 0.01f;
+            if (weaponClone != null)
+            {
+                yield break;
+            }
+            yield return new WaitForSeconds(0.01f);
+        }
+        UIManager.Instance.TurnEnd();
     }
     public void Charging()
     {
+        if (Input.GetKeyUp(KeyCode.Space) && isShoot)
+        {
+            int weaponType = (int)UIManager.Instance.selectedWeaponType;
+            int itemType = (int)UIManager.Instance.selectedItemType;
+            Shoot(weaponType, itemType);
+        }
         if (myTurn && Input.GetKeyDown(KeyCode.Space))
         {
             rigidbody.constraints = RigidbodyConstraints2D.FreezePositionX;
@@ -109,14 +141,6 @@ public class PlayerController : MonoBehaviourPun
             isShoot = true;
             isAction = true;
             ChargingShootPower();
-        }
-        if (Input.GetKeyUp(KeyCode.Space) && isShoot)
-        {
-            int weaponType = (int)UIManager.Instance.selectedWeaponType;
-            int itemType = (int)UIManager.Instance.selectedItemType;
-            Debug.Log(gameObject.name);
-            Shoot(weaponType, itemType);
-            Shooted();
         }
     }
     public void SelectAction()
@@ -142,12 +166,20 @@ public class PlayerController : MonoBehaviourPun
                 else //if (Input.GetKeyUp(leftKey) || Input.GetKeyUp(rightKey))
                 {
                     xInput = 0;
-                    lookPosition = 0;
+                    // lookPosition = 0;
                     rigidbody.constraints = RigidbodyConstraints2D.FreezePositionX;
                 }
             }
-            else
+            else if (!isShoot)
             {
+                if (Input.GetKey(leftKey))
+                {
+                    lookPosition = -1;
+                }
+                else if (Input.GetKey(rightKey))
+                {
+                    lookPosition = 1;
+                }
                 xInput = 0;
                 rigidbody.constraints = RigidbodyConstraints2D.FreezePositionX;
             }
@@ -176,8 +208,10 @@ public class PlayerController : MonoBehaviourPun
         isRotatecannon = true;
         isShoot = false;
         isAction = false;
+        myTurn = false;
         chargingGauge.SetActive(false);
-        rigidbody.constraints = RigidbodyConstraints2D.None;
+        // rigidbody.constraints = RigidbodyConstraints2D.None;
+        isShooted = true;
     }
 
     public void ChargingShootPower()
@@ -186,6 +220,8 @@ public class PlayerController : MonoBehaviourPun
         {
             chargingGauge.SetActive(true);
             chargingGaugeBar.value = 0;
+            UIManager.Instance.weaponOptions.gameObject.SetActive(false);
+            UIManager.Instance.itemOptions.gameObject.SetActive(false);
         }
     }
 
@@ -195,15 +231,13 @@ public class PlayerController : MonoBehaviourPun
         {
             if (isIncrease)
             {
-                chargingGaugeBar.value += framePerAddingValue;
+                chargingGaugeBar.value += framePerAddingValue * Time.deltaTime;
                 if (chargingGaugeBar.value == chargingMax)
                 {
                     isIncrease = false;
                     int weaponType = (int)UIManager.Instance.selectedWeaponType;
                     int itemType = (int)UIManager.Instance.selectedItemType;
-                    Debug.Log(gameObject.name);
                     Shoot(weaponType, itemType);
-                    Shooted();
                 }
             }
             else
@@ -252,6 +286,7 @@ public class PlayerController : MonoBehaviourPun
             }
         }
     }
+
     public bool isNearGrounded;
     private void RotateFloorAngle()
     {
@@ -340,61 +375,112 @@ public class PlayerController : MonoBehaviourPun
             case 6:
             case 7:
             case 8:
-                ShootType(weaponType);
+                ShootType(weaponType, itemType);
                 break;
             case 1:
-                ShootType(weaponType, threeBallAngle);
+                ShootType(weaponType, itemType, threeBallAngle);
                 break;
             default:
                 break;
         }
-        // Debug.Log(((int)selectedWeaponType));
         UIManager.Instance.DecreaseWeaponCount(weaponType);
         UIManager.Instance.DecreaseItemCount(itemType);
     }
     public GameObject weaponClone;
     public TMP_Text d;
-    public void ShootType(int weaponNumber)
+    public void ShootType(int _weaponType, int _itemType)
     {
         float chargingValue = chargingGaugeBar.value;
 
         // 게임 오브젝트 생성 및 로컬 플레이어에 의한 조작
         Vector2 force = (shootPositon.position - cannon.transform.position) * chargingValue;
-        photonView.RPC("NormalShoot", RpcTarget.All, force, weaponNumber);
+        switch (_itemType)
+        {
+            case 1:
+                StartCoroutine(DoubleShot(force, _weaponType));
+                break;
+            case 2:
+                PV.RPC("Shield", RpcTarget.All);
+                PV.RPC("NormalShoot", RpcTarget.All, force, _weaponType);
+                break;
+            default:
+                PV.RPC("NormalShoot", RpcTarget.All, force, _weaponType);
+                break;
+        }
+    }
+    public IEnumerator DoubleShot(Vector2 force, int _weaponType)
+    {
+        PV.RPC("NormalShoot", RpcTarget.All, force, _weaponType);
+        while (weaponClone != null)
+        {
+            yield return null;
+        }
+        PV.RPC("NormalShoot", RpcTarget.All, force, _weaponType);
+        Shooted();
     }
     [PunRPC]
-    public void NormalShoot(Vector2 force, int weaponNumber)
+    public void NormalShoot(Vector2 force, int weaponType)
     {
-        weaponClone = Instantiate(Resources.Load<GameObject>("Prefabs/Weapons/" + weaponNames[weaponNumber]), shootPositon.position, Quaternion.identity);
+        weaponClone = Instantiate(Resources.Load<GameObject>("Prefabs/Weapons/" + weaponNames[weaponType]), shootPositon.position, Quaternion.identity);
         weaponClone.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
+        Shooted();
     }
-    public void ShootType(int weaponNumber, float angle)
+    public void ShootType(int _weaponType, int _itemType, float angle)
+    {
+        float chargingValue = chargingGaugeBar.value;
+        Vector2 force = (shootPositon.position - cannon.transform.position) * chargingValue;
+        switch (_itemType)
+        {
+            case 1:
+                StartCoroutine(DoubleShot(angle, force, _weaponType));
+                break;
+            case 2:
+                PV.RPC("Shield", RpcTarget.All);
+                PV.RPC("ThreeShoot", RpcTarget.All, angle, force, _weaponType);
+                break;
+            default:
+                PV.RPC("ThreeShoot", RpcTarget.All, angle, force, _weaponType);
+                break;
+        }
+    }
+    public IEnumerator DoubleShot(float angle, Vector2 force, int _weaponType)
+    {
+        PV.RPC("ThreeShoot", RpcTarget.All, angle, force, _weaponType);
+        while (weaponClone != null)
+        {
+            yield return null;
+        }
+        PV.RPC("ThreeShoot", RpcTarget.All, angle, force, _weaponType);
+        Shooted();
+    }
+    [PunRPC]
+    public void ThreeShoot(float angle, Vector2 force, int weaponType)
     {
         float addingAngle = angle;
         angle = -angle;
         for (int i = 0; i < 3; ++i)
         {
-            float chargingValue = chargingGaugeBar.value;
-            Vector2 force = (shootPositon.position - cannon.transform.position) * chargingValue;
-            photonView.RPC("ThreeShoot", RpcTarget.All, angle, force, weaponNumber);
+            weaponClone = Instantiate(Resources.Load<GameObject>("Prefabs/Weapons/" + weaponNames[weaponType]), shootPositon.position, Quaternion.identity);
+            weaponClone.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
+            weaponClone.GetComponent<Rigidbody2D>().AddForce(Vector2.up * angle, ForceMode2D.Impulse);
             angle += addingAngle;
         }
+        Shooted();
     }
+    public GameObject shield;
     [PunRPC]
-    public void ThreeShoot(float angle, Vector2 force, int weaponNumber)
+    public void Shield()
     {
-        weaponClone = Instantiate(Resources.Load<GameObject>("Prefabs/Weapons/" + weaponNames[weaponNumber]), shootPositon.position, Quaternion.identity);
-        weaponClone.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
-        weaponClone.GetComponent<Rigidbody2D>().AddForce(Vector2.up * angle, ForceMode2D.Impulse);
+        shield.SetActive(true);
     }
     public void CannonUp(int _directionCheck)
     {
-        cannon.transform.eulerAngles += new Vector3(0, 0, .1f * _directionCheck);
+        cannon.transform.eulerAngles += new Vector3(0, 0, 1f * cannonMoveSpeed * _directionCheck * Time.deltaTime);
     }
 
     public void CannonDown(int _directionCheck)
     {
-        cannon.transform.eulerAngles += new Vector3(0, 0, -.1f * _directionCheck);
+        cannon.transform.eulerAngles += new Vector3(0, 0, -1f * cannonMoveSpeed * _directionCheck * Time.deltaTime);
     }
 
     private void SlopeCheckHorizontal(Vector2 checkPos)
@@ -455,49 +541,43 @@ public class PlayerController : MonoBehaviourPun
 
     public void Flip()
     {
-        // facingDirection *= -1;
-        // transform.localScale = new Vector3(facingDirection * setScale, 1, 1);
+        facingDirection *= -1;
+        transform.GetChild(1).localScale = new Vector3(facingDirection * setScale, 1, 1);
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Explosion"))
         {
-            hpBar.value -= other.GetComponentInParent<Weapons>().damage;
-            if (hpBar.value <= 0)
+            if (shield.activeSelf)
+            {
+                hpBar.value -= other.GetComponentInParent<Weapons>().damage / 2;
+                other.GetComponent<CapsuleCollider2D>().enabled = false;
+                shield.SetActive(false);
+            }
+            else
+            {
+                hpBar.value -= other.GetComponentInParent<Weapons>().damage;
+                other.GetComponent<CapsuleCollider2D>().enabled = false;
+            }
+            if (UIManager.Instance.tank.GetComponent<PlayerController>().hpBar.value <= 0)
             {
                 PV.RPC("GameEnd", RpcTarget.All);
             }
+            UIManager.Instance.SetPlayerHp((int)hpBar.value, gameObject);
         }
     }
+    public bool gameEnd;
+    public bool leaveRoom;
     [PunRPC]
     public void GameEnd()
     {
-        if (UIManager.Instance.tank.GetComponent<PlayerController>().hpBar.value <= 0)
-        {
-            Lose();
-        }
-        else
-        {
-            Win();
-        }
-    }
-    public void Lose()
-    {
-        UIManager.Instance.loseButton.SetActive(true);
-        UIManager.Instance.loseButton.GetComponent<Button>().onClick.AddListener(NextGame);
-    }
-    public void Win()
-    {
-        UIManager.Instance.winButton.SetActive(true);
-        UIManager.Instance.winButton.GetComponent<Button>().onClick.AddListener(NextGame);
+        myTurn = false;
+        gameEnd = true;
+        //ui 메니저에서 방나가기 불러오기
     }
     public int lobbyScene = 0;
-    public void NextGame()
-    {
-        // Destroy(gameObject);
-        SceneManager.LoadSceneAsync("StartScene");
-    }
+
     void OnCollisionEnter2D(Collision2D other)
     {
         if (other.gameObject.CompareTag("Wall"))

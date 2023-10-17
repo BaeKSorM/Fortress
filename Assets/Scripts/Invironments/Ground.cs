@@ -29,8 +29,6 @@ public class Ground : MonoBehaviourPun
         pixelHeight = sr.sprite.texture.height;
         CameraController.Instance.mapLeftMax = -worldWidth / 2;
         CameraController.Instance.mapRightMax = worldWidth / 2;
-        // Debug.Log(worldWidth + "," + worldHeight);
-        // Debug.Log(pixelWidth + "," + pixelHeight);
 
         polygonCollider = GetComponent<PolygonCollider2D>();
         compositeCollider = GetComponent<CompositeCollider2D>();
@@ -90,7 +88,6 @@ public class Ground : MonoBehaviourPun
     public void MakeDot(Vector3 pos)
     {
         Vector2Int pixelPosition = WorldToPixel(pos);
-        Debug.Log(pos + "/" + pixelPosition);
 
         newTexture.SetPixel(pixelPosition.x, pixelPosition.y, Color.clear);
         newTexture.SetPixel(pixelPosition.x + 1, pixelPosition.y, Color.clear);
@@ -110,10 +107,8 @@ public class Ground : MonoBehaviourPun
         Vector2Int pixelPosition = Vector2Int.zero;
         var dx = pos.x - transform.position.x;
         var dy = pos.y - transform.position.y;
-        // Debug.Log(dx + "," + dy);
         pixelPosition.x = Mathf.RoundToInt(0.5f * pixelWidth + dx * (pixelWidth / worldWidth));
         pixelPosition.y = Mathf.RoundToInt(0.5f * pixelHeight + dy * (pixelHeight / worldHeight));
-        // Debug.Log(pixelPosition);
 
         return pixelPosition;
     }

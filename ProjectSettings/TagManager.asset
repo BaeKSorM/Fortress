@@ -9,6 +9,7 @@ TagManager:
   - Explosion
   - Wall
   - Cannon
+  - Shield
   layers:
   - Default
   - TransparentFX
@@ -16,16 +17,16 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - Explosion
   - Ground
   - Player
-  - Weapon
+  - Shield
   - NoCollide
   - DamageArea
-  - 
-  - 
-  - 
-  - 
+  - NoneTriggerWeapon
+  - TriggerWeapon
+  - Wind
+  - Wall
   - 
   - 
   - 
