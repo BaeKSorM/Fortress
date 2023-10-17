@@ -7,7 +7,6 @@ using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
 using System.Linq;
-using System.Reflection;
 
 public class UIManager : MonoBehaviourPunCallbacks
 {
@@ -112,6 +111,11 @@ public class UIManager : MonoBehaviourPunCallbacks
     // Ready 장면 UI 초기화 함수
     public void InitializeReadySceneUI()
     {
+        if (PhotonNetwork.InRoom)
+        {
+            PhotonNetwork.LeaveRoom();
+            PhotonNetwork.LeaveLobby();
+        }
         PhotonNetwork.ConnectUsingSettings();
 
         ConnectionStatus = GameObject.Find("CN").GetComponent<TMP_Text>();
@@ -188,6 +192,12 @@ public class UIManager : MonoBehaviourPunCallbacks
         readiedPlayerCount = 1;
 
         isSetButtons = false;
+        pressNextGame = false;
+
+        if (PhotonNetwork.InLobby)
+        {
+            StartCoroutine(WaitFadeOut());
+        }
 
         for (int i = 0; i < currentImageIndexes.Count; ++i)
         {
@@ -230,7 +240,6 @@ public class UIManager : MonoBehaviourPunCallbacks
             case "GrassLand":
                 mapSpawnPoints = GrassLand;
                 break;
-
         }
         string spawnTankName = "Prefabs/Tanks/" + playerCannon + playerTankTop + playerTankBottom + "Tank";
         tank = PhotonNetwork.Instantiate(spawnTankName, mapSpawnPoints[playerOrder], Quaternion.identity);
@@ -317,6 +326,7 @@ public class UIManager : MonoBehaviourPunCallbacks
         winButton.SetActive(false);
         loseButton.SetActive(false);
         currentScene = CurrentScene.Game;
+        StartCoroutine(FadeInOut.Instance.FadeOut());
     }
     public GameObject loseButton;
     public GameObject winButton;
@@ -342,7 +352,6 @@ public class UIManager : MonoBehaviourPunCallbacks
     [PunRPC]
     void SavePlayerColor()
     {
-        SceneManager.LoadSceneAsync(mapNameText.text);
         string cannon = currentImage[4].GetComponent<Image>().sprite.name;
         int cannonIdx = cannon.IndexOf("_");
         cannon = cannon.Substring(0, cannonIdx);
@@ -359,6 +368,13 @@ public class UIManager : MonoBehaviourPunCallbacks
         PlayerPrefs.SetString("PlayerCannon", playerCannon);
         PlayerPrefs.SetString("PlayerTankTop", playerTankTop);
         PlayerPrefs.SetString("PlayerTankBottom", playerTankBottom);
+        StartCoroutine(GoToGameScene());
+    }
+    IEnumerator GoToGameScene()
+    {
+        StartCoroutine(FadeInOut.Instance.FadeIn());
+        yield return new WaitForSeconds(FadeInOut.Instance.fadeDuration);
+        SceneManager.LoadSceneAsync(mapNameText.text);
     }
     void ReadyGame()
     {
@@ -366,10 +382,6 @@ public class UIManager : MonoBehaviourPunCallbacks
         gameReady.gameObject.SetActive(false);
         gameReadyCancel.gameObject.SetActive(true);
         readyPanel.SetActive(true);
-        if (playerOrder != 0)
-        {
-            gameQuit.gameObject.SetActive(false);
-        }
     }
     void ReadyCancelGame()
     {
@@ -655,6 +667,7 @@ public class UIManager : MonoBehaviourPunCallbacks
     }
     public override void OnJoinedLobby()
     {
+        StartCoroutine(FadeInOut.Instance.FadeOut());
     }
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
@@ -665,18 +678,21 @@ public class UIManager : MonoBehaviourPunCallbacks
     {
         string roomName = RandomRoomName(roomNameLength);
         PhotonNetwork.CreateRoom(roomName);
+        StartCoroutine(FadeInOut.Instance.FadeIn());
     }
 
     // JoinRoom 함수: 방 입장
     public void JoinRoom()
     {
         insertRooomKey.gameObject.SetActive(true);
+        StartCoroutine(FadeInOut.Instance.FadeIn());
     }
 
     // JoinRandomRoom 함수: 랜덤 방 입장
     public void JoinRandomRoom()
     {
         PhotonNetwork.JoinRandomRoom();
+        StartCoroutine(FadeInOut.Instance.FadeIn());
     }
     // EnterJoinRoom 함수: 방 입장 확인
     public void EnterJoinRoom()
@@ -684,6 +700,7 @@ public class UIManager : MonoBehaviourPunCallbacks
         if (roomNames.Contains(roomKey.text))
         {
             PhotonNetwork.JoinRoom(roomKey.text);
+            StartCoroutine(FadeInOut.Instance.FadeIn());
         }
         else
         {
@@ -739,8 +756,11 @@ public class UIManager : MonoBehaviourPunCallbacks
         }
     }
     public GameObject playerInfo;
-    public override void OnJoinedRoom()
+    IEnumerator RoomUIActivate()
     {
+        yield return new WaitForSeconds(FadeInOut.Instance.fadeDuration);
+        StartCoroutine(FadeInOut.Instance.FadeOut());
+
         inviteKey.text = "Invite : " + PhotonNetwork.CurrentRoom.Name;
         roomUI.gameObject.SetActive(true);
         string cannon = currentImage[4].GetComponent<Image>().sprite.name;
@@ -754,10 +774,13 @@ public class UIManager : MonoBehaviourPunCallbacks
         bottom = bottom.Substring(0, bottomIdx);
         photonView.RPC("SettingPlayerInfo", RpcTarget.AllBufferedViaServer, cannon, top, bottom);
 
-
         gameReadyCancel.gameObject.SetActive(false);
         playerActorNumbers.Add(PhotonNetwork.LocalPlayer.ActorNumber);
         photonView.RPC("RefreshPlayerInfo", RpcTarget.AllViaServer);
+    }
+    public override void OnJoinedRoom()
+    {
+        StartCoroutine(RoomUIActivate());
     }
     public bool isSetButtons;
     public int playerOrder;
@@ -1014,14 +1037,26 @@ public class UIManager : MonoBehaviourPunCallbacks
             }
         }
     }
+    IEnumerator FadeInAndMoveLobby()
+    {
+        yield return StartCoroutine(FadeInOut.Instance.FadeIn());
+        SceneManager.LoadSceneAsync("LobbyScene");
+    }
+    IEnumerator WaitFadeOut()
+    {
+        yield return StartCoroutine(FadeInOut.Instance.FadeIn());
+        SceneManager.LoadSceneAsync("LobbyScene");
+    }
+    public bool goReady;
     void Update()
     {
         switch (currentScene)
         {
             case CurrentScene.None:
-                if (Input.GetKeyDown(KeyCode.LeftControl))
+                if (Input.GetKeyDown(KeyCode.LeftControl) && !goReady)
                 {
-                    SceneManager.LoadSceneAsync("LobbyScene");
+                    goReady = true;
+                    StartCoroutine(FadeInAndMoveLobby());
                 }
                 break;
             case CurrentScene.Ready:
@@ -1071,10 +1106,10 @@ public class UIManager : MonoBehaviourPunCallbacks
                         {
                             itemsCount[i] = 0;
                         }
-                        PhotonNetwork.CurrentRoom.IsOpen = false;
-                        PhotonNetwork.CurrentRoom.IsVisible = false;
+                        // PhotonNetwork.CurrentRoom.IsOpen = false;
+                        // PhotonNetwork.CurrentRoom.IsVisible = false;
+
                         roomNames.Remove(PhotonNetwork.CurrentRoom.Name);
-                        PhotonNetwork.LeaveRoom();
                         Debug.Log(playerController.gameEnd);
                     }
                 }
@@ -1091,10 +1126,14 @@ public class UIManager : MonoBehaviourPunCallbacks
                 break;
         }
     }
+    public bool pressNextGame;
     public void NextGame()
     {
-        isSetButtons = false;
-        SceneManager.LoadSceneAsync("LobbyScene");
-        // PhotonNetwork.Destroy(gameObject);
+        if (!pressNextGame)
+        {
+            isSetButtons = false;
+            pressNextGame = true;
+            StartCoroutine(WaitFadeOut());
+        }
     }
 }
