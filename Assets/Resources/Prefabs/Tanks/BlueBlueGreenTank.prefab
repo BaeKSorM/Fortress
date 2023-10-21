@@ -623,7 +623,7 @@ MonoBehaviour:
   groundCheckRadius: 7.15
   jumpForce: 0
   slopeCheckDistance: 0.5
-  maxSlopeAngle: 85
+  maxSlopeAngle: 90
   groundCheck: {fileID: 1275709690500710047}
   whatIsGround:
     serializedVersion: 2
@@ -633,7 +633,7 @@ MonoBehaviour:
   slopeSideAngle: 0
   lastSlopeAngle: 0
   shootPowerMax: 50
-  framePerAddingValue: 10
+  framePerAddingValue: 25
   facingDirection: 1
   isGrounded: 0
   isOnSlope: 0
@@ -655,6 +655,7 @@ MonoBehaviour:
   lookPosition: 1
   cannonMoveSpeed: 50
   maxHp: 100
+  PV: {fileID: 0}
   isShooted: 0
   isNearGrounded: 0
   weaponNames:
@@ -670,6 +671,8 @@ MonoBehaviour:
   weaponClone: {fileID: 0}
   d: {fileID: 0}
   shield: {fileID: 0}
+  gameEnd: 0
+  leaveRoom: 0
   lobbyScene: 0
 --- !u!50 &391173191765665163
 Rigidbody2D:

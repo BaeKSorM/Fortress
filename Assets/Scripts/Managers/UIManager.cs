@@ -212,8 +212,9 @@ public class UIManager : MonoBehaviourPunCallbacks
         lobby.gameObject.SetActive(true);
     }
     public GameObject tank;
-    List<Vector2> mapSpawnPoints = new();
+    public List<Vector2> mapSpawnPoints = new();
     public List<Vector2> GrassLand = new() { new(-10.9f, 1.8f), new(10.9f, 1.8f) };
+    public List<Vector2> DunGeon = new() { new(-10.9f, 1.8f), new(10.9f, 1.8f) };
     public PlayerController playerController;
     public TMP_Text windPowerText;
     public GameObject selectedWeapon;
@@ -239,6 +240,9 @@ public class UIManager : MonoBehaviourPunCallbacks
         {
             case "GrassLand":
                 mapSpawnPoints = GrassLand;
+                break;
+            case "Dungeon":
+                mapSpawnPoints = DunGeon;
                 break;
         }
         string spawnTankName = "Prefabs/Tanks/" + playerCannon + playerTankTop + playerTankBottom + "Tank";
@@ -392,6 +396,11 @@ public class UIManager : MonoBehaviourPunCallbacks
     }
     public void QuitGame()
     {
+        StartCoroutine(Quit());
+    }
+    IEnumerator Quit()
+    {
+        yield return StartCoroutine(FadeInOut.Instance.FadeIn());
         if (PhotonNetwork.InRoom)
         {
             PhotonNetwork.LeaveRoom();
@@ -685,14 +694,13 @@ public class UIManager : MonoBehaviourPunCallbacks
     public void JoinRoom()
     {
         insertRooomKey.gameObject.SetActive(true);
-        StartCoroutine(FadeInOut.Instance.FadeIn());
     }
 
     // JoinRandomRoom 함수: 랜덤 방 입장
     public void JoinRandomRoom()
     {
-        PhotonNetwork.JoinRandomRoom();
         StartCoroutine(FadeInOut.Instance.FadeIn());
+        PhotonNetwork.JoinRandomRoom();
     }
     // EnterJoinRoom 함수: 방 입장 확인
     public void EnterJoinRoom()
@@ -857,28 +865,33 @@ public class UIManager : MonoBehaviourPunCallbacks
             if (playerOrder == 0)
             {
                 turnPanel.transform.GetChild(0).GetComponent<TMP_Text>().text = "나의 턴";
+                turnPanel.SetActive(true);
+                yield return new WaitForSeconds(1.0f);
                 playerController.myTurn = true;
             }
             else
             {
                 turnPanel.transform.GetChild(0).GetComponent<TMP_Text>().text = $"{currentTurn - 1}번째 플레이어턴";
+                turnPanel.SetActive(true);
+                yield return new WaitForSeconds(1.0f);
                 playerController.myTurn = false;
             }
         }
         else if (currentTurn == playerOrder)
         {
             turnPanel.transform.GetChild(0).GetComponent<TMP_Text>().text = "나의 턴";
+            turnPanel.SetActive(true);
+            yield return new WaitForSeconds(1.0f);
             playerController.myTurn = true;
         }
         else
         {
             turnPanel.transform.GetChild(0).GetComponent<TMP_Text>().text = $"{currentTurn + 1}번째 플레이어턴";
+            turnPanel.SetActive(true);
+            yield return new WaitForSeconds(1.0f);
             playerController.myTurn = false;
         }
-        turnPanel.SetActive(true);
-        yield return new WaitForSeconds(1.0f);
         turnPanel.SetActive(false);
-        yield return null;
     }
     public void SetPhotonButtons()
     {
@@ -1061,7 +1074,7 @@ public class UIManager : MonoBehaviourPunCallbacks
                 break;
             case CurrentScene.Ready:
                 ConnectionStatus.text = PhotonNetwork.NetworkClientState.ToString();
-                if (content.childCount > 0)
+                if (roomUI.gameObject.activeSelf && content.childCount > 0)
                 {
                     if (content.childCount != int.Parse(content.GetChild(content.childCount - 1).GetComponent<PlayerInfomation>().playerOrder.text))
                     {

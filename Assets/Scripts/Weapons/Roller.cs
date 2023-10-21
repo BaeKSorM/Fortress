@@ -65,14 +65,18 @@ public class Roller : Weapons
                     switch (moveDirection)
                     {
                         case MoveDirection.Forward:
-                            if (lookDirection == 1 ? moveStartPosition.x * 1.5f > transform.position.x : moveStartPosition.x * 1.5f < transform.position.x)
+                            if (lookDirection == 1 ?
+                                moveStartPosition.x * 1.5f > transform.position.x :
+                                moveStartPosition.x * 1.5f < transform.position.x)
                             {
                                 closePosition = moveStartPosition;
                                 movePoint = point;
                             }
                             break;
                         case MoveDirection.Backward:
-                            if (lookDirection == 1 ? moveStartPosition.x * 1.5f < transform.position.x : moveStartPosition.x * 1.5f > transform.position.x)
+                            if (lookDirection == 1 ?
+                                moveStartPosition.x * 1.5f < transform.position.x :
+                                moveStartPosition.x * 1.5f > transform.position.x)
                             {
                                 closePosition = moveStartPosition;
                                 movePoint = point;
@@ -85,6 +89,9 @@ public class Roller : Weapons
                 ++point;
             }
             StartCoroutine(Rolling(movePoint));
+            Debug.Log(movePoint);
+            // Debug.Log(other.gameObject.GetComponent<PolygonCollider2D>().points.Length);
+            // Debug.Log(polygonCollider.points.Length);
         }
     }
     IEnumerator Rolling(int _movePoint)
@@ -119,7 +126,7 @@ public class Roller : Weapons
             }
             StartCoroutine(Rolling(_movePoint));
         }
-
+        Debug.Log(_movePoint);
     }
     int MoveForward(int _movePoint)
     {

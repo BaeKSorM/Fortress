@@ -104,6 +104,15 @@ public class PlayerController : MonoBehaviourPun
         CannonMove();
         RotateFloorAngle();
         Charging();
+        // Debug.Log($"{transform.eulerAngles.z} * {transform.GetChild(1).localScale.x} = {transform.eulerAngles.z * transform.GetChild(1).localScale.x}");
+        if (transform.GetChild(1).localScale.x > 0)
+        {
+            rigidbody.gravityScale = ((transform.eulerAngles.z / 100) > 0) ? (transform.eulerAngles.z / 100) : 1;
+        }
+        else if (transform.GetChild(1).localScale.x < 0)
+        {
+            rigidbody.gravityScale = ((4 - (transform.eulerAngles.z / 100)) < 4 && (transform.eulerAngles.z / 100) > 0) ? (4 - (transform.eulerAngles.z / 100)) : 1;
+        }
         if (isShooted && weaponClone == null)
         {
             StartCoroutine(TurnEndCheck());
@@ -352,14 +361,7 @@ public class PlayerController : MonoBehaviourPun
             newVelocity.Set(movementSpeed * xInput, rigidbody.velocity.y);
             rigidbody.velocity = newVelocity;
         }
-        if (isNearGrounded)
-        {
-            rigidbody.gravityScale = 2;
-        }
-        else
-        {
-            rigidbody.gravityScale = 5;
-        }
+
     }
 
     public List<string> weaponNames = new List<string>() { "Shot", "Three-Ball", "One-Bounce", "Roller", "Back-Roller", "Granade", "Spliter", "Breaker", "Sniper" };
@@ -547,6 +549,7 @@ public class PlayerController : MonoBehaviourPun
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        Debug.Log(other.name);
         if (other.CompareTag("Explosion"))
         {
             if (shield.activeSelf)
