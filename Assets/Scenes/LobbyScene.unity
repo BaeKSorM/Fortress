@@ -1226,7 +1226,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Join Random Room
+  m_text: "\uBE60\uB978 \uBC29 \uCC3E\uAE30"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a28b4eedd3bc4cc42a1feb20090496ae, type: 2}
   m_sharedMaterial: {fileID: -1321513128445643649, guid: a28b4eedd3bc4cc42a1feb20090496ae, type: 2}
@@ -1503,7 +1503,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &283312598
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1713,7 +1713,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &318416691
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2445,7 +2445,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 172870715}
   m_HandleRect: {fileID: 172870714}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -4591,7 +4591,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 430.00003}
+  m_AnchoredPosition: {x: 0, y: 429.99997}
   m_SizeDelta: {x: 1000, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &971797758
@@ -4962,7 +4962,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Cancel
+  m_text: Cancle
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a28b4eedd3bc4cc42a1feb20090496ae, type: 2}
   m_sharedMaterial: {fileID: -1321513128445643649, guid: a28b4eedd3bc4cc42a1feb20090496ae, type: 2}
@@ -5096,7 +5096,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: This Key Is Wrong
+  m_text: "\uCD08\uB300\uCF54\uB4DC\uAC00 \uC874\uC7AC\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a28b4eedd3bc4cc42a1feb20090496ae, type: 2}
   m_sharedMaterial: {fileID: -1321513128445643649, guid: a28b4eedd3bc4cc42a1feb20090496ae, type: 2}
@@ -5123,8 +5123,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 142
-  m_fontSizeBase: 142
+  m_fontSize: 102
+  m_fontSizeBase: 102
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -5510,7 +5510,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Join Room
+  m_text: "\uBC29 \uCC38\uAC00\uD558\uAE30"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a28b4eedd3bc4cc42a1feb20090496ae, type: 2}
   m_sharedMaterial: {fileID: -1321513128445643649, guid: a28b4eedd3bc4cc42a1feb20090496ae, type: 2}
@@ -6275,7 +6275,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Enter
+  m_text: "\uBC29 \uCC3E\uAE30"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a28b4eedd3bc4cc42a1feb20090496ae, type: 2}
   m_sharedMaterial: {fileID: -1321513128445643649, guid: a28b4eedd3bc4cc42a1feb20090496ae, type: 2}
@@ -7490,7 +7490,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Invite : 44444'
+  m_text: "\uCD08\uB300\uCF54\uB4DC : 44444"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a28b4eedd3bc4cc42a1feb20090496ae, type: 2}
   m_sharedMaterial: {fileID: -1321513128445643649, guid: a28b4eedd3bc4cc42a1feb20090496ae, type: 2}
@@ -7624,7 +7624,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Rest Stats : 3'
+  m_text: "\uC2A4\uD0EF : 3"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a28b4eedd3bc4cc42a1feb20090496ae, type: 2}
   m_sharedMaterial: {fileID: -1321513128445643649, guid: a28b4eedd3bc4cc42a1feb20090496ae, type: 2}
@@ -7733,11 +7733,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 659241099}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 2.5, y: 0}
-  m_SizeDelta: {x: 495, y: 50}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 170, y: 50}
+  m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &1475164232
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7758,7 +7758,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: DoubleShot
+  m_text: Double Shot
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a28b4eedd3bc4cc42a1feb20090496ae, type: 2}
   m_sharedMaterial: {fileID: -1321513128445643649, guid: a28b4eedd3bc4cc42a1feb20090496ae, type: 2}
@@ -7792,7 +7792,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 32
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -9242,7 +9242,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Cancel
+  m_text: "\uCDE8\uC18C"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a28b4eedd3bc4cc42a1feb20090496ae, type: 2}
   m_sharedMaterial: {fileID: -1321513128445643649, guid: a28b4eedd3bc4cc42a1feb20090496ae, type: 2}
@@ -9618,7 +9618,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Make Room
+  m_text: "\uBC29 \uB9CC\uB4E4\uAE30"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a28b4eedd3bc4cc42a1feb20090496ae, type: 2}
   m_sharedMaterial: {fileID: -1321513128445643649, guid: a28b4eedd3bc4cc42a1feb20090496ae, type: 2}
@@ -10325,11 +10325,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1567990910}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 5, y: 0}
-  m_SizeDelta: {x: 495, y: 50}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 170, y: 50}
+  m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &2032472470
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10384,7 +10384,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 32
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0

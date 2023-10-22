@@ -81,7 +81,7 @@ public class UIManager : MonoBehaviourPunCallbacks
     public Button enterJoinRoomButton;  // 방 입장 확인 버튼
     public Button cancelJoinRoomButton;  // 방 입장 취소 버튼
     public TMP_InputField roomKey;  // 방 키 입력 필드
-    public TMP_Text ConnectionStatus;  // 연결 상태 텍스트
+    // public TMP_Text ConnectionStatus;  // 연결 상태 텍스트
 
     // 기타 변수들
     #region 
@@ -118,7 +118,7 @@ public class UIManager : MonoBehaviourPunCallbacks
         }
         PhotonNetwork.ConnectUsingSettings();
 
-        ConnectionStatus = GameObject.Find("CN").GetComponent<TMP_Text>();
+        // ConnectionStatus = GameObject.Find("CN").GetComponent<TMP_Text>();
 
         gameStart = GameObject.Find("GoGame").GetComponent<Button>();
         gameStart.onClick.AddListener(() => GoGame());
@@ -1073,7 +1073,7 @@ public class UIManager : MonoBehaviourPunCallbacks
                 }
                 break;
             case CurrentScene.Ready:
-                ConnectionStatus.text = PhotonNetwork.NetworkClientState.ToString();
+                // ConnectionStatus.text = PhotonNetwork.NetworkClientState.ToString();
                 if (roomUI.gameObject.activeSelf && content.childCount > 0)
                 {
                     if (content.childCount != int.Parse(content.GetChild(content.childCount - 1).GetComponent<PlayerInfomation>().playerOrder.text))
