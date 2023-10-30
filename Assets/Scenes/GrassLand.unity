@@ -3379,6 +3379,7 @@ MonoBehaviour:
   cameraRightKey: 275
   mapLeftMax: 0
   mapRightMax: 0
+  mapSize: 0
   sideBlock: 8.9
   cameraMoveSpeed: 5
 --- !u!1 &520919742

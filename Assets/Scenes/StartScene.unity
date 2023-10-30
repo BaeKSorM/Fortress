@@ -249,6 +249,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 97498415}
     m_Modifications:
     - target: {fileID: 1135721365088619762, guid: dd5a20bf5c7c4d549b9ab96bfc8d325f, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1135721365088619762, guid: dd5a20bf5c7c4d549b9ab96bfc8d325f, type: 3}
       propertyPath: m_Color.a
       value: 0
       objectReference: {fileID: 0}
@@ -461,11 +465,19 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 3225133769914909819, guid: dd16501ab47d8944ea05f82be4f4274a, type: 3}
+      propertyPath: mapNames.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3225133769914909819, guid: dd16501ab47d8944ea05f82be4f4274a, type: 3}
       propertyPath: mapNames.Array.data[1]
-      value: Dungeon
+      value: GrassLand
       objectReference: {fileID: 0}
     - target: {fileID: 3225133769914909819, guid: dd16501ab47d8944ea05f82be4f4274a, type: 3}
       propertyPath: mapNames.Array.data[2]
+      value: Dungeon
+      objectReference: {fileID: 0}
+    - target: {fileID: 3225133769914909819, guid: dd16501ab47d8944ea05f82be4f4274a, type: 3}
+      propertyPath: mapNames.Array.data[3]
       value: Dungeon
       objectReference: {fileID: 0}
     - target: {fileID: 3225133769914909819, guid: dd16501ab47d8944ea05f82be4f4274a, type: 3}
@@ -501,7 +513,23 @@ PrefabInstance:
       value: 1.34
       objectReference: {fileID: 0}
     - target: {fileID: 3225133769914909819, guid: dd16501ab47d8944ea05f82be4f4274a, type: 3}
+      propertyPath: mapMaxPlayerCounts.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3225133769914909819, guid: dd16501ab47d8944ea05f82be4f4274a, type: 3}
+      propertyPath: mapMaxPlayerCounts.Array.data[0]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3225133769914909819, guid: dd16501ab47d8944ea05f82be4f4274a, type: 3}
       propertyPath: mapMaxPlayerCounts.Array.data[1]
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3225133769914909819, guid: dd16501ab47d8944ea05f82be4f4274a, type: 3}
+      propertyPath: mapMaxPlayerCounts.Array.data[2]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3225133769914909819, guid: dd16501ab47d8944ea05f82be4f4274a, type: 3}
+      propertyPath: mapMaxPlayerCounts.Array.data[3]
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4154276208507641623, guid: dd16501ab47d8944ea05f82be4f4274a, type: 3}
@@ -761,37 +789,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1691999255
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1691999256}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1691999256
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1691999255}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1983867494
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -800,6 +797,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 634076692}
     m_Modifications:
+    - target: {fileID: 2034364398154404867, guid: c35b9428380326140a988a6580175714, type: 3}
+      propertyPath: m_text
+      value: Fortress
+      objectReference: {fileID: 0}
+    - target: {fileID: 2034364398154404867, guid: c35b9428380326140a988a6580175714, type: 3}
+      propertyPath: m_fontStyle
+      value: 32
+      objectReference: {fileID: 0}
     - target: {fileID: 2178912923329615451, guid: c35b9428380326140a988a6580175714, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -884,6 +889,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: StartScreeen
       objectReference: {fileID: 0}
+    - target: {fileID: 8995782202770128896, guid: c35b9428380326140a988a6580175714, type: 3}
+      propertyPath: m_text
+      value: Press Enter
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -902,6 +911,5 @@ SceneRoots:
   - {fileID: 634076692}
   - {fileID: 967488869}
   - {fileID: 1365900221}
-  - {fileID: 1076377462}
   - {fileID: 97498415}
-  - {fileID: 1691999256}
+  - {fileID: 1076377462}

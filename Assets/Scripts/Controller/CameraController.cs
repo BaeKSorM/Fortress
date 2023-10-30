@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Microsoft.Unity.VisualStudio.Editor;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
@@ -9,12 +10,15 @@ public class CameraController : MonoBehaviour
     public KeyCode cameraRightKey;
     public float mapLeftMax;
     public float mapRightMax;
+    public float mapSize;
     public float sideBlock;
     public float cameraMoveSpeed;
     void Start()
     {
         Instance = this;
-        Transform playerTransform = UIManager.Instance.tank.transform;
+        mapSize = GameObject.Find("Ground").GetComponent<SpriteRenderer>().bounds.size.x;
+        mapLeftMax = -mapSize / 2;
+        mapRightMax = mapSize / 2;
         transform.position = new Vector3(UIManager.Instance.mapSpawnPoints[UIManager.Instance.playerOrder].x / 5,
                                          0,
                                         -10);

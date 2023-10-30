@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.Audio;
 
 public class PlayerController : MonoBehaviourPun
 {
@@ -59,9 +60,9 @@ public class PlayerController : MonoBehaviourPun
     public int cannonMoveSpeed;
     public int maxHp;
     public PhotonView PV;
+    public AudioSource audioSource;
     public void Awake()
     {
-
     }
     void Start()
     {
@@ -69,6 +70,8 @@ public class PlayerController : MonoBehaviourPun
         // {
         //     gameObject.SetActive(false);
         // }
+        audioSource = GetComponent<AudioSource>();
+        audioSource.clip = Resources.Load<AudioClip>("AudioClips/CannonSound");
         PV = GetComponent<PhotonView>();
         Instance = this;
         rigidbody = GetComponent<Rigidbody2D>();
@@ -138,6 +141,7 @@ public class PlayerController : MonoBehaviourPun
     {
         if (Input.GetKeyUp(KeyCode.Space) && isShoot)
         {
+            audioSource.Play();
             int weaponType = (int)UIManager.Instance.selectedWeaponType;
             int itemType = (int)UIManager.Instance.selectedItemType;
             Shoot(weaponType, itemType);
@@ -284,7 +288,7 @@ public class PlayerController : MonoBehaviourPun
     {
         if (myTurn && isRotatecannon)
         {
-            int directionCheck = (int)transform.localScale.x;
+            int directionCheck = (int)transform.GetChild(1).localScale.x;
             if (Input.GetKey(upKey))
             {
                 CannonUp(directionCheck);
@@ -361,7 +365,6 @@ public class PlayerController : MonoBehaviourPun
             newVelocity.Set(movementSpeed * xInput, rigidbody.velocity.y);
             rigidbody.velocity = newVelocity;
         }
-
     }
 
     public List<string> weaponNames = new List<string>() { "Shot", "Three-Ball", "One-Bounce", "Roller", "Back-Roller", "Granade", "Spliter", "Breaker", "Sniper" };
