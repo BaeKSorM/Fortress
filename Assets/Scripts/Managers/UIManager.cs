@@ -767,8 +767,6 @@ public class UIManager : MonoBehaviourPunCallbacks
     IEnumerator RoomUIActivate()
     {
         yield return new WaitForSeconds(FadeInOut.Instance.fadeDuration);
-        StartCoroutine(FadeInOut.Instance.FadeOut());
-
         inviteKey.text = "Invite : " + PhotonNetwork.CurrentRoom.Name;
         roomUI.gameObject.SetActive(true);
         string cannon = currentImage[4].GetComponent<Image>().sprite.name;
@@ -785,6 +783,8 @@ public class UIManager : MonoBehaviourPunCallbacks
         gameReadyCancel.gameObject.SetActive(false);
         playerActorNumbers.Add(PhotonNetwork.LocalPlayer.ActorNumber);
         photonView.RPC("RefreshPlayerInfo", RpcTarget.AllViaServer);
+        yield return new WaitForSeconds(FadeInOut.Instance.fadeDuration);
+        StartCoroutine(FadeInOut.Instance.FadeOut());
     }
     public override void OnJoinedRoom()
     {
@@ -840,15 +840,15 @@ public class UIManager : MonoBehaviourPunCallbacks
         wind.windPower = (float)randomValue / 10;
         if (randomValue > 0)
         {
-            windDirectionImage.sprite = Resources.LoadAll<Sprite>("Images/windDirection")[1];
+            windDirectionImage.sprite = Resources.LoadAll<Sprite>("Images/UI/windDirection")[1];
         }
         else if (randomValue < 0)
         {
-            windDirectionImage.sprite = Resources.LoadAll<Sprite>("Images/windDirection")[2];
+            windDirectionImage.sprite = Resources.LoadAll<Sprite>("Images/UI/windDirection")[2];
         }
         else
         {
-            windDirectionImage.sprite = Resources.LoadAll<Sprite>("Images/windDirection")[0];
+            windDirectionImage.sprite = Resources.LoadAll<Sprite>("Images/UI/windDirection")[0];
         }
         windPowerText.text = randomValue.ToString();
     }
@@ -896,7 +896,6 @@ public class UIManager : MonoBehaviourPunCallbacks
     public void SetPhotonButtons()
     {
         playerOrder = content.childCount - 1;
-        Debug.Log(playerOrder);
         if (playerOrder != 0)
         {
             photonView.RPC("RefreshReadiedPlayer", RpcTarget.All, 0, playerOrder);
@@ -920,7 +919,6 @@ public class UIManager : MonoBehaviourPunCallbacks
         }
         else
         {
-            Debug.Log("1");
             currentImage[3].sprite = Resources.Load<Sprite>("images/Backgrounds/" + mapNames[0]);
             mapName = mapNames[0];
             mapMaxPlayerText.text = $"MaxPlayers : {mapMaxPlayerCounts[0]}";
@@ -1087,7 +1085,6 @@ public class UIManager : MonoBehaviourPunCallbacks
                     }
                     if (photonView.IsMine)
                     {
-                        Debug.Log("4");
                         if (!content.GetChild(0).GetChild(3).GetChild(0).gameObject.activeSelf)
                         {
                             content.GetChild(0).GetChild(3).GetChild(0).gameObject.SetActive(true);
